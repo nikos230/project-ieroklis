@@ -7,11 +7,9 @@ how to use....
 ### Installation
 test 14121 test
 
-### How to Use
-how to use ....
 
-#### Pre-training
+### Pre-training
 test 14121
 
-#### Fine-tune
+### Fine-tune
 210 2310
