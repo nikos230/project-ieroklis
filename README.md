@@ -1,4 +1,4 @@
-# Project Ieroklis (Pi-π)
+# Project Ieroklis 
 ## About
 This repo contains ready-to-use python scripts to:
 - **Pre-train** Masked Auto Encoders (MAE) with Vision Transformer (ViT) backbone
