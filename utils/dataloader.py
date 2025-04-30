@@ -11,13 +11,14 @@ import numpy as np
 from torch.utils.data import Dataset
 
 
-class Generic_Dataset(Dataset):
-    def __init__(self, filename_image, filename_mask, bands):
-        self.filename_image = filename_image
-        self.filename_mask  = filename_mask
-        self.bands          = bands
-        self.fill_nan_value = 0 # nan values are filled with zero
-        self.data           = []
+class Seviri_Dataset(Dataset):
+    def __init__(self, filenames, mode, bands):
+
+        self.filenames        = filenames
+        self.mode             = mode
+        self.bands            = bands
+        self.fill_nan_value   = 0 # nan values are filled with zero
+        self.data             = []
         self.load_data()
 
 
@@ -27,71 +28,101 @@ class Generic_Dataset(Dataset):
 
     def select_bands(self, data):
         return data.sel(band=self.bands)
-
-    def select_dates(self, data):
-        # TODO: add selection by dates for the images and masks
-        return 0
         
 
-    def load_data(self):    
-        # open image using xarray (for seviri we open .tif files)
-        image_data = xr.open_dataset(self.filename_image)
+    def load_data(self):
+         
+        # load only images 
+        if self.mode == "pre-train":
 
-        # select specific bands
-        image_data = self.select_bands(image_data)
+            for file_image in self.filenames:
+                # open image using xarray (for seviri we open .tif files)
+                image_data = xr.open_dataset(file_image)
 
-        # fill nan values
-        image_data = self.fill_nan_values(image_data)
+                # select specific bands
+                image_data = self.select_bands(image_data)
 
-        # put image data to a list for all bands
-        image_data_array = []
-        for band_idx in image_data.band-1:
-            image_data_array.append(image_data.isel(band=band_idx)['band_data'].values)
+                # fill nan values
+                image_data = self.fill_nan_values(image_data)
 
-        # load mask using xarray (for seviri its .tif files)
-        mask_data = xr.open_dataset(self.filename_mask)
+                # put image data to a list for all bands and normalize
+                image_data_array = []
+                for band_idx in image_data.band-1:
+                    data_array = image_data.isel(band=band_idx)['band_data'].values
 
-        # put mask data into a list
-        mask_data_array = []
-        mask_data_array.append(mask_data.isel(band=0)['band_data'].values)
-        
-        # close data sources
-        image_data.close()
-        mask_data.close()
+                    # normalize in range of [0, 1]
+                    data_array_min_value = data_array.min()
+                    data_array_max_value = data_array.max()
+                    data_array_normalized = (data_array - data_array_min_value) / (data_array_max_value - data_array_min_value)
 
-        # append the image list and mask list to a list
-        self.data.append((image_data_array, mask_data_array))
-        
-        return 0
+                    image_data_array.append(data_array_normalized)
+
+                self.data.append(image_data_array)
+                
+                # close data source
+                image_data.close()    
+
+        elif self.mode == "fine-tune":
+
+            for files in self.filenames:
+                
+                # split image and mask paths
+                image_data_file, mask_data_file = files[0], files[1]
+
+                # open image using xarray (for seviri we open .tif files)
+                image_data = xr.open_dataset(image_data_file)
+
+                # select specific bands
+                image_data = self.select_bands(image_data)
+
+                # fill nan values
+                image_data = self.fill_nan_values(image_data)
+
+                # put image data to a list for all bands and normalize
+                image_data_array = []
+                for band_idx in image_data.band-1:
+                    data_array = image_data.isel(band=band_idx)['band_data'].values
+
+                    # normalize in range of [0, 1]
+                    data_array_min_value = data_array.min()
+                    data_array_max_value = data_array.max()
+                    data_array_normalized = (data_array - data_array_min_value) / (data_array_max_value - data_array_min_value)
+
+                    image_data_array.append(data_array_normalized)
+
+
+                # load mask files for fine-tune
+                # load mask using xarray (for seviri its .tif files)
+                mask_data = xr.open_dataset(mask_data_file)
+
+                # put mask data into a list
+                mask_data_array = []
+                mask_data_array.append(mask_data.isel(band=0)['band_data'].values)
+
+                # TODO : Add normalization for masks
+                
+                # close data source
+                image_data.close() 
+                mask_data.close()
+
+                self.data.append((image_data_array, mask_data_array))
 
 
 
     def __len__(self):
-        return len(self.filename_image)
+        return len(self.filenames_images)
 
 
     def __getitem__(self, idx):
-        image, mask = self.data = [idx]
-
-        # convert input image and mask to torch tensors
-        image = torch.tensor(image, dtype=torch.float32)
-        mask = torch.tesnor(mask, dtype=torch.float32)
-
-        return image, msk
+        if self.mode == "pre-train":
+            image = self.data[idx]
+            return torch.tensor(image, dtype=torch.float32)
+            
+        elif self.mode == "fine-tune":
+            image, mask = self.data[idx][0], self.data[idx][1]
+            # convert input image and mask to torch tensors and return
+            return torch.tensor(image, dtype=torch.float32), torch.tensor(mask, dtype=torch.float32)
 
 
     
-        
-
-if __name__ == "__main__":
-    os.system('clear')
-    print('DataLoader testing...')
-
-    images_path = "dataset/images/20230506131241_patch_203.tif"
-    masks_path = "dataset/masks/20230506131241_patch_203.tif"
-
-    bands = [1, 2, 3]
-
-    data = Generic_Dataset(images_path, masks_path, bands)  
-
-    #data.load_data()      
+     

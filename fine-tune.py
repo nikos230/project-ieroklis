@@ -1,0 +1,81 @@
+import os
+import yaml
+from utils.utils import fix_lists, fix_band_list, get_data_files_pre_train
+from utils.utils import get_data_files_fine_tune # remove this, just for test
+from utils.dataloader import Seviri_Dataset
+
+
+
+def pre_train(
+            dataset_path_images, 
+            dataset_path_masks,
+            data_extension, 
+            pre_train_years, 
+            pre_train_months, 
+            pre_train_exclude_days,
+            include_bands):
+
+
+        # load the data file names
+        #data_files_images = get_data_files_pre_train(dataset_path_images, data_extension, pre_train_years, pre_train_months, pre_train_exclude_days)
+        
+        # define pre-train dataset | set "filename_mask" to none for pre-training
+        #pre_train_dataset = Seviri_Dataset(filenames=data_files_images, mode='pre-train', bands=include_bands)
+
+
+        data_files_fine_tune = get_data_files_fine_tune(dataset_path_images, dataset_path_masks, data_extension, pre_train_years, pre_train_months, pre_train_exclude_days)
+
+        fine_tune_dataset = Seviri_Dataset(filenames=data_files_fine_tune, mode="fine-tune", bands=include_bands)
+
+        #print(data_files_images)
+
+        #print(pre_train_dataset[1].shape) #  pre_train_dataset[index of sample][ index of channel]
+
+        #print(fine_tune_dataset[1][0].shape) # fine_tune_dataset[index of sample][index of image of mask]
+
+
+
+
+
+
+
+if __name__ == "__main__":
+    os.system('clear')
+
+   # load dataset config
+    with open('configs/dataset.yaml', 'r') as file:
+        dataset_config = yaml.safe_load(file)
+    file.close()
+
+    # load fine-tune config
+    with open('configs/fine-tune_config.yaml', 'r') as file:
+        fine_tune_config = yaml.safe_load(file)
+    file.close()
+
+    # load years, months and days from config for dataset
+    pre_train_years        = dataset_config['dataset']['include_years']
+    pre_train_months       = dataset_config['dataset']['include_months']
+    pre_train_exclude_days = dataset_config['dataset']['exclude_days']
+
+    # load dataset paths
+    dataset_path_images    = dataset_config['dataset']['images_path']
+    dataset_path_masks     = dataset_config['dataset']['masks_path']
+    data_extension         = dataset_config['dataset']['data_extension']
+
+    # load included bands 
+    include_bands          = dataset_config['dataset']['include_bands']
+
+
+    pre_train_years, pre_train_months, pre_train_exclude_days = fix_lists(pre_train_years, pre_train_months, pre_train_exclude_days)
+    include_bands = fix_band_list(include_bands)
+
+   
+
+    pre_train(
+        dataset_path_images, 
+        dataset_path_masks,
+        data_extension, 
+        pre_train_years, 
+        pre_train_months, 
+        pre_train_exclude_days,
+        include_bands)  
