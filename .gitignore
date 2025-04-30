@@ -176,3 +176,4 @@ cython_debug/
 
 # additional folders of the project-ieroklis
 output/
+dataset/

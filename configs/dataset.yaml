@@ -1,0 +1,12 @@
+# This config includes all nessesary dataset paths and settings related to seviri data
+
+dataset:
+  images_path:     "dataset/images"    # path to folder containing images
+  masks_path:      "dataset/masks"     # path to folder containing masks
+
+  include_years:   "2023, 2024"        # include data from years
+  include_months:  "5, 6, 7, 8, 9"     # include data from months
+  exclude_days:    "None"              # exlucde some days from months if needed, else they are all included
+
+
+
