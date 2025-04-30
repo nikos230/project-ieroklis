@@ -5,7 +5,8 @@ This repo contains ready-to-use python scripts to:
 - **Fine-tune** pre-trained models with MAE encoder and Convolutional decoder
 
 ## Getting Started
-how to use....
+You can't use this repo at this time!
+
 ### Installation
 test 14121 test
 
