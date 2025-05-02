@@ -1,16 +1,19 @@
 # config for pre-train
 
 pre-train:
+  # save path for checkpoints or models
+  checkpoint_save_path:  "output/checkpoint_folder"  # path to folder for saving checkpoints
+
   # pre-train settings
-  checkpoint_save_path:   "output/checkpoint_folder"  # path to folder for saving checkpoints
-  learning_rate: "1e-4"  # change later
-  batch_size:    "64"    # default 64
-  loss_function: "ce"    # cross-entropy - to be added (dice, bce loss will be also available)
-  class_weights: "1, 10" # weights for class 1 and class 2, used only for "ce" loss function
+  batch_size:         "64"     # default 64
+  learning_rate:      "1e-4"   # change later
+  mask_ratio:         "0.75"   # default 75 %
+  loss_function:      "ce"     # cross-entropy - to be added (dice, bce loss will be also available)
+  class_weights:      "1, 10"  # weights for class 1 and class 2, used only for "ce" loss function
 
   # model h-parameters for ViT Encoder
   patch_size:         "4"      # define a patch size for ViT backbone
-  num_frames:         "1"      # default value = 1
+  #num_frames:         "1"      # default value = 1 (REMOVED)
   embed_dim:          "1024"   # default value = 1024
   depth:              "24"     # default value = 24
   num_heads:          "16"     # defult value = 16
@@ -21,8 +24,8 @@ pre-train:
   decoder_num_heads:  "16"     # default value = 16
 
   # additional settings
-  mlp_ratio:          "4"      # default value = 4, may be replaced with actual mlp size
+  mlp_ratio:          "4"     # default value = 4, may be replaced with actual mlp size
   norm_pixel_loss:    "False"  # default value = False
-  coords_encooding:   "None"   # default vlue = False
-  coords_scale_learn: "False"  # default value = False
-  encoder_only:       "False"  # may not be used in pre-train script 
+  #coords_encooding:   "None"   # default vlue = False (REMOVED)
+  #coords_scale_learn: "False"  # default value = False (REMOVED)
+  #encoder_only:       "False"  # may not be used in pre-train script (REMOVED)

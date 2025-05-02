@@ -110,7 +110,7 @@ class Seviri_Dataset(Dataset):
 
 
     def __len__(self):
-        return len(self.filenames_images)
+        return len(self.filenames)
 
 
     def __getitem__(self, idx):

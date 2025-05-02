@@ -133,8 +133,6 @@ def get_data_files_fine_tune(dataset_path_images, dataset_path_masks, data_exten
 
 
 
-
-
 # function to fix years, months and days lists from yaml config file
 def fix_lists(pre_train_years, pre_train_months, pre_train_exlude_days):
     if pre_train_years == "all":
@@ -168,3 +166,13 @@ def fix_band_list(bands):
     bands = list(map(int, bands))
     
     return bands
+
+
+# function to turn "True" or "False" to True and False (string to boolean)
+def string_to_boolean(string):
+    if string == "False":
+        return False
+    else:
+        return True    
+     
+

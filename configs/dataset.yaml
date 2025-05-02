@@ -1,8 +1,8 @@
 # This config includes all nessesary dataset paths and settings related to seviri data
 
 dataset:
-  images_path:     "dataset_14121/images"    # path to folder containing images
-  masks_path:      "dataset_14121/masks"     # path to folder containing masks
+  images_path:     "dataset/seviri_dataset_testing/images"    # path to folder containing images
+  masks_path:      "dataset/seviri_dataset_testing/masks"     # path to folder containing masks
   data_extension:  ".tif"                    # pre-define image and mask file extension
 
   include_years:   "2023, 2024"        # include data from years, if set to "all" all available years are included
