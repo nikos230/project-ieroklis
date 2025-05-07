@@ -27,6 +27,10 @@ class Seviri_Dataset(Dataset):
         return data.fillna(self.fill_nan_value)
 
     def select_bands(self, data):
+        #print(self.bands)
+        #print(data.sel(band=self.bands))
+        #print(data.sel(band=self.bands))
+        #exit(22)
         return data.sel(band=self.bands)
         
 
@@ -47,16 +51,21 @@ class Seviri_Dataset(Dataset):
 
                 # put image data to a list for all bands and normalize
                 image_data_array = []
-                for band_idx in image_data.band-1:
-                    data_array = image_data.isel(band=band_idx)['band_data'].values
+                for band_idx in range(0, len(self.bands)):
+                    data_array = image_data['band_data'][band_idx].values
 
                     # normalize in range of [0, 1]
                     data_array_min_value = data_array.min()
                     data_array_max_value = data_array.max()
-                    data_array_normalized = (data_array - data_array_min_value) / (data_array_max_value - data_array_min_value)
+
+                    if data_array_max_value > data_array_min_value:
+                        data_array_normalized = (data_array - data_array_min_value) / (data_array_max_value - data_array_min_value)
+                    else:
+                        data_array_normalized = np.zeros_like(data_array)
 
                     image_data_array.append(data_array_normalized)
-
+                    
+                
                 self.data.append(image_data_array)
                 
                 # close data source
@@ -80,9 +89,9 @@ class Seviri_Dataset(Dataset):
 
                 # put image data to a list for all bands and normalize
                 image_data_array = []
-                for band_idx in image_data.band-1:
-                    data_array = image_data.isel(band=band_idx)['band_data'].values
-
+                for band_idx in range(0, len(self.bands)-1):
+                    data_array = image_data['band_data'][band_idx].values
+                    
                     # normalize in range of [0, 1]
                     data_array_min_value = data_array.min()
                     data_array_max_value = data_array.max()

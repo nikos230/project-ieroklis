@@ -1,14 +1,16 @@
 import os
 import yaml
 import torch
+import torch.nn as nn
 import warnings
 warnings.filterwarnings("ignore") # TODO: remove this in final release
-from utils.utils import fix_lists, fix_band_list, get_data_files_pre_train, string_to_boolean
-from utils.utils import get_data_files_fine_tune # TODO: remove this, just for test
+from utils.utils import fix_lists, fix_band_list, get_data_files_pre_train, remove_shared_months, string_to_boolean, visualize_results, create_loss_plots
 from utils.dataloader import Seviri_Dataset
 from models.MaskedAutoEncoderViT.MaskedAutoEncoderViTModel import MaskedAutoEncoderViTModel
 from torch.utils.data import DataLoader
-
+from torch.optim.lr_scheduler import OneCycleLR
+from torch.cuda.amp import autocast, GradScaler
+from tqdm import tqdm
 
 def pre_train(
         dataset_path_images, 
@@ -17,13 +19,15 @@ def pre_train(
         pre_train_years, 
         pre_train_months, 
         pre_train_exclude_days,
+        validation_years,
+        validation_months,
+        validation_exclude_days,
         include_bands,
         checkpoint_path,
         learning_rate,
+        num_of_epochs,
         batch_size,
         mask_ratio,
-        loss_function,
-        class_weights,
         patch_size,
         embed_dim,
         depth,
@@ -35,15 +39,23 @@ def pre_train(
         norm_pixel_loss):
 
 
-        # load the data file names (paths)
-        data_files_images = get_data_files_pre_train(dataset_path_images, data_extension, pre_train_years, pre_train_months, pre_train_exclude_days)
+        # load the data file names (paths) for pre-train data
+        data_files_images_pre_train = get_data_files_pre_train(dataset_path_images, data_extension, pre_train_years, pre_train_months, pre_train_exclude_days)
 
+        # load the data file names (paths) for validation data
+        data_files_images_validation = get_data_files_pre_train(dataset_path_images, data_extension, validation_years, validation_months, validation_exclude_days)
+        
+        # this is a helper function, if a month from a specific year from pre-training is also present in validation data, remove it from pre-training
+        data_files_images_pre_train = remove_shared_months(data_files_images_pre_train, data_files_images_validation)
+        
         # define pre-train dataset | set "mode" to "pre-train" for pre-training
-        pre_train_dataset = Seviri_Dataset(filenames=data_files_images, mode='pre-train', bands=include_bands)
-        #print(f"Total images for pre-train: {len(pre_train_dataset)}") # TODO: enable print
-       
+        pre_train_dataset = Seviri_Dataset(filenames=data_files_images_pre_train, mode='pre-train', bands=include_bands)
+        print(f"Total images for pre-train: {len(pre_train_dataset)}") # TODO: enable print
 
-
+        # define validation dataset | set "mode" to "pre-training" for pre-training
+        validation_dataset = Seviri_Dataset(filenames=data_files_images_validation, mode='pre-train', bands=include_bands)
+        print(f"Total images for validation: {len(validation_dataset)}")
+        
         # TODO: fix: UserWarning: Creating a tensor from a list of numpy.ndarrays 
         # is extremely slow. Please consider converting the list to a single 
         # numpy.ndarray with numpy.array() before converting to a tensor. 
@@ -53,12 +65,18 @@ def pre_train(
                                     batch_size=batch_size,
                                     shuffle=True,
                                     num_workers=0)
+
+        # define validation data and load into ram
+        validation_data = DataLoader(validation_dataset, 
+                                    batch_size=batch_size,
+                                    shuffle=True,
+                                    num_workers=0)                            
         
 
         # Seviri input data have shape of (batch, channels, height, width) = (64, 11, 32, 32)
         input_image_size      = pre_train_dataset[0].shape[1] # get input size by height of the image
         input_channels_number = pre_train_dataset[0].shape[0] # get input channels if the image
-
+        
         # initiate model with parameters
         model = MaskedAutoEncoderViTModel(img_size=input_image_size,
                                           patch_size=patch_size,
@@ -80,21 +98,93 @@ def pre_train(
         # pass the model to GPU
         model.to(device)
 
-        # put model into train mode
-        model.train()
-
-
         # using AdamW optimizer for ViT models
-        #optimizer = torch.optim.AdamW(params=model.parameters(), lr=learning_rate) # TODO: add weight decay and betas
-        #optimizer.zero_grad()
+        optimizer = torch.optim.AdamW(params=model.parameters(), lr=1e-4) # TODO: add weight decay and betas
+        
+        # calculate number of steps per epoch
+        steps_per_epoch = len(pre_train_dataset)  # Assuming train_loader is your DataLoader
+        total_steps = num_of_epochs * steps_per_epoch
 
+        # using learing rate scheduler
+        scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=learning_rate, total_steps=total_steps)
+
+        # track loss and rmse
+        metrics = {}
 
         # main pre-train loop
-        for image in pre_train_data:
-            # pass input data to gpu device (if cuda was available)
-            image = image.to(device)
+        for epoch in range(num_of_epochs): # image shape = (batch, channels, height, width)
+            
+            # put model into train mode
+            model.train(True)
 
-            output = model(image)
+            for image in tqdm(pre_train_data):
+                mean_loss_interation = 0
+
+                # pass input data to gpu device (if cuda was available)
+                image = image.to(device)
+                
+                # forward images to model ands get loss, prediction and mask
+                optimizer.zero_grad()
+
+                #scaler = GradScaler()
+
+                loss, prediction, mask = model(image)
+
+                # get loss value from tensor
+                loss_value = loss.item()
+                
+                mean_loss_interation += loss_value
+
+                # do backprogation
+                #scaler.scale(loss).backward()
+                loss.backward()
+                torch.nn.utils.clip_grad_norm_(parameters=model.parameters(), max_norm=1)
+                optimizer.step()
+
+                #scaler.update()
+
+                # chaging learing rate per interation isted of per epoch
+                #scheduler.step(loss_value)
+
+                
+                
+            print(f"Epoch: {epoch}, Mean pre-train Loss: {mean_loss_interation/len(pre_train_dataset)}, Learing Rate: {optimizer.param_groups[0]['lr']}")    
+            
+            # validation step
+
+            # put model into validation mode
+            model.eval()
+
+            with torch.no_grad():
+                for image_val in validation_data:
+                    mean_loss_interation_val = 0
+
+                    # pass input data to gpu device (if cuda was available)
+                    image = image.to(device)
+
+                    loss, prediction, mask = model(image)
+
+                    # get loss value from tensor
+                    loss_value = loss.item()
+                    
+                    mean_loss_interation_val += loss_value
+
+                print(f"Mean validation Loss: {mean_loss_interation_val/len(validation_dataset)}\n")
+
+            # save average metrics for epoch
+            metrics[epoch] = {}
+            metrics[epoch]['pre_train_loss'] = mean_loss_interation / len(pre_train_dataset)
+            metrics[epoch]['validation_loss'] = mean_loss_interation_val / len(validation_dataset)
+
+            # save current model
+            torch.save(model, f"{checkpoint_path}/epoch_{epoch}")
+
+        visualize_results(model, validation_data)
+        create_loss_plots(metrics)
+        
+
+
+            
 
 
 
@@ -119,9 +209,13 @@ if __name__ == "__main__":
 
 
     # load years, months and days from config for dataset
-    pre_train_years        = dataset_config['dataset']['include_years']
-    pre_train_months       = dataset_config['dataset']['include_months']
-    pre_train_exclude_days = dataset_config['dataset']['exclude_days']
+    pre_train_years        = dataset_config['dataset']['train']['include_years']
+    pre_train_months       = dataset_config['dataset']['train']['include_months']
+    pre_train_exclude_days = dataset_config['dataset']['train']['exclude_days']
+    
+    validation_years        = dataset_config['dataset']['validation']['include_years']
+    validation_months       = dataset_config['dataset']['validation']['include_months']
+    validation_exclude_days = dataset_config['dataset']['validation']['exclude_days']
 
     # load dataset paths
     dataset_path_images    = dataset_config['dataset']['images_path']
@@ -133,11 +227,10 @@ if __name__ == "__main__":
 
     # load pre-train settings
     checkpoint_path        = pre_train_config['pre-train']['checkpoint_save_path']
+    num_of_epochs          = pre_train_config['pre-train']['num_of_epochs']
     batch_size             = pre_train_config['pre-train']['batch_size']
     learning_rate          = pre_train_config['pre-train']['learning_rate']
     mask_ratio             = pre_train_config['pre-train']['mask_ratio']
-    loss_function          = pre_train_config['pre-train']['loss_function']
-    class_weights          = pre_train_config['pre-train']['class_weights']
 
     # load MaskedAutoEncoderViT Model h-parameters for pre-training | Encoder h-parameters
     patch_size             = pre_train_config['pre-train']['patch_size']
@@ -157,13 +250,14 @@ if __name__ == "__main__":
 
     # fix variables types
     pre_train_years, pre_train_months, pre_train_exclude_days = fix_lists(pre_train_years, pre_train_months, pre_train_exclude_days)
+    validation_years, validation_months, validation_exclude_days = fix_lists(validation_years, validation_months, validation_exclude_days )
     include_bands = fix_band_list(include_bands)
 
     patch_size = int(patch_size)
     learning_rate = float(learning_rate)
+    num_of_epochs = int(num_of_epochs)
     batch_size = int(batch_size)
     mask_ratio = float(mask_ratio)
-    class_weights = fix_band_list(class_weights)
     embed_dim = int(embed_dim)
     depth = int(depth)
     num_heads = int(num_heads)
@@ -186,13 +280,15 @@ if __name__ == "__main__":
         pre_train_years, 
         pre_train_months, 
         pre_train_exclude_days,
+        validation_years,
+        validation_months,
+        validation_exclude_days,
         include_bands,
         checkpoint_path,
         learning_rate,
+        num_of_epochs,
         batch_size,
         mask_ratio,
-        loss_function,
-        class_weights,
         patch_size,
         embed_dim,
         depth,

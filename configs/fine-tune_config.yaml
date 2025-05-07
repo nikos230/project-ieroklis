@@ -1,1 +1,2 @@
-# config for fine-tuning
+  #loss_function:      "ce"     # cross-entropy - to be added (dice, bce loss will be also available)
+  #class_weights:      "1, 10"  # weights for class 1 and class 2, used only for "ce" loss function# config for fine-tuning

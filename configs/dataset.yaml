@@ -1,15 +1,29 @@
 # This config includes all nessesary dataset paths and settings related to seviri data
 
 dataset:
-  images_path:     "dataset/seviri_dataset_testing/images"    # path to folder containing images
-  masks_path:      "dataset/seviri_dataset_testing/masks"     # path to folder containing masks
+  #images_path:     "dataset/seviri_dataset_testing/images"    # path to folder containing images | testing
+  #masks_path:      "dataset/seviri_dataset_testing/masks"     # path to folder containing masks  | testing
+  images_path:     "dataset/seviri_dataset/images"    # path to folder containing images | new
+  masks_path:      "dataset/seviri_dataset/masks"     # path to folder containing masks  | new
   data_extension:  ".tif"                    # pre-define image and mask file extension
+  include_bands:   "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11"        # specify bands to include from .tif files (for images)
 
-  include_years:   "2023, 2024"        # include data from years, if set to "all" all available years are included
-  include_months:  "5, 6, 7, 8, 9"     # include data from months, if set to "all" all available months are included
-  exclude_days:    "None"              # exlucde some days from months if needed, else they are all included
 
-  include_bands:   "1, 2, 3, 4"        # specify bands to include from .tif files (for images)
+  train:
+    include_years:   "2020, 2021, 2022, 2023, 2024"  # include data from years, if set to "all" all available years are included   | "2020, 2021, 2022, 2023, 2024"
+    include_months:  "5, 6, 7, 8, 9"     # include data from months, if set to "all" all available months are included  | "5, 6, 7, 8, 9"
+    exclude_days:    "None"              # exlucde some days from months if needed, else they are all included  
+
+  validation:  
+    include_years:   "2024"         
+    include_months:  "8"     
+    exclude_days:    "None" 
+
+  test:  
+    include_years:   "2024"         
+    include_months:  "9"     
+    exclude_days:    "None" 
+  
 
 
 
