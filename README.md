@@ -25,14 +25,14 @@ Install PyTorch separately, to avoid any errors
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
 ```
 
-## Dataset
-This repo was created for multi-spectral remote sensing images. Pre-training script can run with any image size (etc. 224x224, 64x64, 32x32, ...) and with any given number of channels. 
-Data is splitted into 2 folders, **images** and **masks**. The fist is used for pre-training and both folders are used for fine-tune. Pre-trainng images are splitted into pre-training and validation, this is done with the date of the file names etc. "20250512" where 2025 is the year, 08 is the day of the month and the 05 is the month
+## Dataset / Dataloader
+This repo was created for multi-spectral remote sensing images. Pre-training script can run with any image size (etc. 224x224, 64x64, 32x32, ...) and with any given number of channels. <br/><br/>
+Data is splitted into 2 folders, **images** and **masks**. The fist is used for pre-training and both folders are used for fine-tune. Pre-trainng images are splitted into pre-training and validation, this is done with the date of the file names etc. "20250512" where 2025 is the year, 05 is the month and 12 is the day of the month. The provided dataloader is tested with .tif images
 
 ## Pre-training
-With this repo you can use any set of images to pre-train the Masked Auto Encoder ViT model. Given your data is seperated into 2 folders, images and masks. For pre-training only images are needed. In this repo the provided dataloader is configured to split pre-train and validation (and test) sets with the date of the images, example: images from 2022 to 2024 are used for pre-train, images from 2021 are used for validation
+With this repo you can use any set of images to pre-train the Masked Auto Encoder ViT model. 
 
-### Dataloader
+
 
 ### Fine-tune
 210 2310
