@@ -7,7 +7,7 @@ pre-train:
   # pre-train settings
   num_of_epochs:      "50"      # max number of epochs (using 2 for testing)
   batch_size:         "64"     # default 64
-  learning_rate:      "1e-3"   # change later # TODO: rename this into max_learning_rate
+  learning_rate:      "1.5e-4"   # change later # TODO: rename this into max_learning_rate
   mask_ratio:         "0.75"   # default 75 %
 
   # model h-parameters for ViT Encoder

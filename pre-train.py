@@ -8,7 +8,7 @@ from utils.utils import fix_lists, fix_band_list, get_data_files_pre_train, remo
 from utils.dataloader import Seviri_Dataset
 from models.MaskedAutoEncoderViT.MaskedAutoEncoderViTModel import MaskedAutoEncoderViTModel
 from torch.utils.data import DataLoader
-from torch.optim.lr_scheduler import OneCycleLR
+from torch.optim.lr_scheduler import OneCycleLR, ReduceLROnPlateau
 from torch.cuda.amp import autocast, GradScaler
 from tqdm import tqdm
 
@@ -99,16 +99,17 @@ def pre_train(
         model.to(device)
 
         # using AdamW optimizer for ViT models
-        optimizer = torch.optim.AdamW(params=model.parameters(), lr=1e-4) # TODO: add weight decay and betas
+        optimizer = torch.optim.AdamW(params=model.parameters(), lr=learning_rate, betas=(0.9, 0.95), weight_decay=0.1)
         
         # calculate number of steps per epoch
         steps_per_epoch = len(pre_train_dataset)  # Assuming train_loader is your DataLoader
         total_steps = num_of_epochs * steps_per_epoch
 
         # using learing rate scheduler
-        scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=learning_rate, total_steps=total_steps)
+        #scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=learning_rate, total_steps=total_steps)
+        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=3)
 
-        # track loss and rmse
+        # track loss 
         metrics = {}
 
         # main pre-train loop
@@ -143,13 +144,12 @@ def pre_train(
 
                 #scaler.update()
 
-                # chaging learing rate per interation isted of per epoch
+                # chaging learing rate per interation insted of per epoch
                 #scheduler.step(loss_value)
-
-                
                 
             print(f"Epoch: {epoch}, Mean pre-train Loss: {mean_loss_interation/len(pre_train_dataset)}, Learing Rate: {optimizer.param_groups[0]['lr']}")    
             
+
             # validation step
 
             # put model into validation mode
@@ -168,7 +168,9 @@ def pre_train(
                     loss_value = loss.item()
                     
                     mean_loss_interation_val += loss_value
-
+                
+                # update learning rate evvery epoch
+                scheduler.step(mean_loss_interation_val/len(validation_dataset))
                 print(f"Mean validation Loss: {mean_loss_interation_val/len(validation_dataset)}\n")
 
             # save average metrics for epoch
