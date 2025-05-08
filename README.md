@@ -39,4 +39,6 @@ With this repo you can use any set of images to pre-train the Masked Auto Encode
 
 
 ## References
-git repo go here
+[https://github.com/sustainlab-group/SatMAE](https://github.com/sustainlab-group/SatMAE) <br/>
+[https://github.com/facebookresearch/mae](https://github.com/facebookresearch/mae) <br />
+[https://github.com/rwightman/pytorch-image-models/tree/master/timm](https://github.com/rwightman/pytorch-image-models/tree/master/timm)
