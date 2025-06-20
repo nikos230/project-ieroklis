@@ -1,2 +1,20 @@
-  #loss_function:      "ce"     # cross-entropy - to be added (dice, bce loss will be also available)
-  #class_weights:      "1, 10"  # weights for class 1 and class 2, used only for "ce" loss function# config for fine-tuning
+# config for fine-tune
+
+fine-tune:
+  # save path for checkpoints or models
+  checkpoint_save_path:   "output/fine_tune_seviri_checkpoints"  # path to folder for saving checkpoints
+  pre_trained_model_path: "pre-trained_models/Seviri_pre_trained_test.pt"
+  #pre_trained_model_path: "pre-trained_models/Prithvi_EO_V1_100M.pt"
+
+  # fine-tune settings
+  num_of_epochs:      "100"       # max number of epochs (using 2 for testing)
+  batch_size:         "64"      # default 64
+  learning_rate:      "1.5e-4"  # change later 
+
+  # loss function settings
+  loss_function:      "dice"     # loss function | Availbale: cross-entropy = "ce", dice loss = "dice", BCE loss = "bce" not ready yet, BCEDice loss = "bce_dice"
+  class_weights:      "1, 1000"  # weights for class 1 and class 2, used only for "ce" loss function, set to "None" to not use them
+
+  # model h-parameters for ViT Encoder
+  patch_size:         "4"      # define a patch size for ViT backbone
+

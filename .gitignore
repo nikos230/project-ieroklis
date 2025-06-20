@@ -177,4 +177,4 @@ cython_debug/
 # additional folders of the project-ieroklis
 output/
 dataset/
-dataset_14121/
+pre-trained_models

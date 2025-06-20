@@ -179,7 +179,7 @@ def pre_train(
             metrics[epoch]['validation_loss'] = mean_loss_interation_val / len(validation_dataset)
 
             # save current model
-            torch.save(model, f"{checkpoint_path}/epoch_{epoch}")
+            torch.save(model, f"{checkpoint_path}/epoch_{epoch}.pt")
 
         visualize_results(model, validation_data)
         create_loss_plots(metrics)
@@ -221,7 +221,7 @@ if __name__ == "__main__":
 
     # load dataset paths
     dataset_path_images    = dataset_config['dataset']['images_path']
-    dataset_path_masks     = dataset_config['dataset']['masks_path']
+    dataset_path_masks     = dataset_config['dataset']['masks_path'] # TODO: remove this variable
     data_extension         = dataset_config['dataset']['data_extension']
 
     # load included bands 

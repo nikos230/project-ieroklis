@@ -2,6 +2,7 @@ import os
 import glob
 import matplotlib.pyplot as plt
 import torch
+import torch.nn as nn
 
 
 def check_valid_date(data_file, pre_train_years, pre_train_months, pre_train_exclude_days):
@@ -286,6 +287,64 @@ def create_loss_plots(metrics):
     plt.tight_layout()
     plt.savefig('output/train_valdation_loss', dpi=600)
     plt.close()
+
+
+
+def get_configuration(model):
+
+    # dictionary to save model config
+    settings = {}
+    
+    # patch embeding settings
+    patch_embed_config = model.patch_embed.proj
+    settings['input_channels'] = patch_embed_config.in_channels
+    
+    # encoder blocks settings
+    block = model.blocks[0]
+    settings['depth'] = len(model.blocks)
+    settings['embed_dim'] = patch_embed_config.out_channels
+    settings['mlp_hidden_dim'] = block.mlp.fc1.out_features
+    settings['mlp_ratio'] = settings['mlp_hidden_dim'] // settings['embed_dim']
+ 
+    # attention head settings
+    settings['num_heads'] = block.attn.num_heads  
+
+    #print(settings['num_heads'])
+    #print(vars(model))
+    return settings
+
+
+
+def create_fine_tune_plots(fine_tune_metrics, validation_metrics):
+
+    fine_tune_loss = fine_tune_metrics.loss_values
+    validation_loss = validation_metrics.loss_values
+
+    # get list with epochs
+    epochs = list(fine_tune_metrics.loss_values.keys())
+
+    # extract loss values from metrics dictinary
+    fine_tune_loss = [fine_tune_loss[epoch] for epoch in epochs]
+    validation_loss = [validation_loss[epoch] for epoch in epochs]
+    
+    # plot pre-train loss
+    plt.plot(epochs, fine_tune_loss, label='pre-train loss', color='red', marker='')
+    
+    # plot validation loss
+    plt.plot(epochs, validation_loss, label='validation loss', color='blue', marker='')
+
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+
+    plt.title('Fine-tune and Validation Loss')
+    plt.tight_layout()
+    plt.savefig('output/fine_tune_valdation_loss.png', dpi=600)
+    plt.close()
+
+
+
+
+
     
 
             

@@ -6,13 +6,13 @@ pre-train:
 
   # pre-train settings
   num_of_epochs:      "50"      # max number of epochs (using 2 for testing)
-  batch_size:         "64"     # default 64
-  learning_rate:      "1.5e-4"   # change later # TODO: rename this into max_learning_rate
-  mask_ratio:         "0.75"   # default 75 %
+  batch_size:         "64"      # default 64
+  learning_rate:      "1.5e-4"  # change later # TODO: rename this into max_learning_rate
+  mask_ratio:         "0.75"    # default 75 %
 
   # model h-parameters for ViT Encoder
   patch_size:         "4"      # define a patch size for ViT backbone
-  embed_dim:          "1024"    # default value = 1024
+  embed_dim:          "1024"   # default value = 1024
   depth:              "5"      # default value = 24
   num_heads:          "16"     # defult value = 16
 

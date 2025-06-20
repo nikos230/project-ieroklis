@@ -51,6 +51,7 @@ class Seviri_Dataset(Dataset):
 
                 # put image data to a list for all bands and normalize
                 image_data_array = []
+                
                 for band_idx in range(0, len(self.bands)):
                     data_array = image_data['band_data'][band_idx].values
 
@@ -89,13 +90,17 @@ class Seviri_Dataset(Dataset):
 
                 # put image data to a list for all bands and normalize
                 image_data_array = []
-                for band_idx in range(0, len(self.bands)-1):
+                for band_idx in range(0, len(self.bands)):
                     data_array = image_data['band_data'][band_idx].values
-                    
+
                     # normalize in range of [0, 1]
                     data_array_min_value = data_array.min()
                     data_array_max_value = data_array.max()
-                    data_array_normalized = (data_array - data_array_min_value) / (data_array_max_value - data_array_min_value)
+
+                    if data_array_max_value > data_array_min_value:
+                        data_array_normalized = (data_array - data_array_min_value) / (data_array_max_value - data_array_min_value)
+                    else:
+                        data_array_normalized = np.zeros_like(data_array)
 
                     image_data_array.append(data_array_normalized)
 
@@ -107,7 +112,7 @@ class Seviri_Dataset(Dataset):
                 # put mask data into a list
                 mask_data_array = []
                 mask_data_array.append(mask_data.isel(band=0)['band_data'].values)
-
+                
                 # TODO : Add normalization for masks
                 
                 # close data source
