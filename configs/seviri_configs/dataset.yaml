@@ -10,18 +10,18 @@ dataset:
 
 
   train:
-    include_years:   "2024"  # include data from years, if set to "all" all available years are included   | "2020, 2021, 2022, 2023, 2024"
-    include_months:  "8, 9"                 # include data from months, if set to "all" all available months are included  | "5, 6, 7, 8, 9"
+    include_years:   "2020, 2021"                    # include data from years, if set to "all" all available years are included  "2020, 2021"
+    include_months:  "5, 6, 7, 8, 9"                 # include data from months, if set to "all" all available months are included  | "5, 6, 7, 8, 9"
     exclude_days:    "None"                          # exlucde some days from months if needed, else they are all included  
 
   validation:  
-    include_years:   "2024"         
-    include_months:  "8"     
+    include_years:   "2022"         
+    include_months:  "5, 6, 7, 8, 9"     
     exclude_days:    "None" 
 
   test:  
-    include_years:   "2024"         
-    include_months:  "9"     
+    include_years:   "2023, 2024"         
+    include_months:  "5, 6, 7, 8, 9"     
     exclude_days:    "None" 
   
 

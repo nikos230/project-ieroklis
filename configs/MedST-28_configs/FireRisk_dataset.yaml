@@ -1,0 +1,49 @@
+# This config includes all necessary dataset paths and settings related to MedST-28 dataset
+
+dataset:
+  path_to_dataset:          "dataset/FireRisk_dataset_netCDF"                      # path to folder containing dataset
+  path_to_stats:            "dataset/FireRisk_dataset_netCDF/FireRisk_stats.json"  # path to MedST-28 dataset stats (used for normalization)
+  data_extension:           ".nc"                                                  # pre-define dataset files extension
+  time_steps:               "max"                                                  # use "max" to use all available time_steps from sample or specify
+  include_variables:                                                               # specify variables to include from netCDF files
+                            - d2m
+                            - ignition_points
+                            - lai
+                            - lst_day
+                            - lst_night
+                            - ndvi
+                            - rh
+                            - smi
+                            - sp
+                            - ssrd
+                            - t2m
+                            - tp
+                            - wind_direction
+                            - wind_speed
+                            - aspect
+                            - curvature
+                            - dem
+                            - roads_distance
+                            - slope
+                            - lc_agriculture
+                            - lc_forest
+                            - lc_grassland
+                            - lc_settlement
+                            - lc_shrubland
+                            - lc_sparse_vegetation
+                            - lc_water_bodies
+                            - lc_wetland
+                            - population      
+
+  label:                    "burned_areas_has" # variable from netcdf file to be used as label                                    
+
+  train:
+    include_years:          "all"              # include data from years, if set to "all" all available years are included except those specified in validation and test sets (2006-2020)
+    
+  validation:  
+    include_years:          "2021, 2022"         
+
+  test:  
+    include_years:          "2020"         
+    
+  reference_date:           "2000-01-01"    # DO NOT CHANGE | reference day to get temporal encoding (Year, Month, Day) 

@@ -1,0 +1,22 @@
+# config for fine-tune
+
+fine-tune:
+  # save path for checkpoints or models
+  checkpoint_save_path:   "output/fine_tune_MedST28_fire_risk_1.6M"       # path to folder for saving checkpoints while fine-tuning
+  pre_trained_model_path: "pre-trained_models/MedST28_1.6M.pt"          # path to a checkpoint model
+
+  # pre-trained model from Hugging Face (insert model name) input "none" to use a local checkpoint
+  # if you use a pre-trained model from Hugging Face then the local pre-trained model (if any) will not be loaded
+  pre_trained_model_name: "none" # google/vit-base-patch16-224 | ibm-nasa-geospatial/Prithvi-EO-1.0-100M
+
+  # fine-tune settings
+  num_of_epochs:      "100"       # max number of epochs (using 2 for testing)
+  batch_size:         "256"      # default 64
+  learning_rate:      "1e-4"  # change later 
+
+  # loss function settings
+  loss_function:      "ce"     # loss function | Available: cross-entropy = "ce", dice loss = "dice", BCE loss = "bce", BCE+Dice loss = "bce_dice"
+  class_weights:      "1, 1"  # weights for class 1 and class 2, used only for "ce" and bce_dice loss functions, set to "None" to not use them
+
+  # model h-parameters for ViT Encoder
+  patch_size:         "1"      # define a patch size for ViT backbone, if different from pre-trained models patch_size will use user input but will delete proj layer

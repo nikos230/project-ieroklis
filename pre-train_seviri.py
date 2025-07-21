@@ -5,11 +5,10 @@ import torch.nn as nn
 import warnings
 warnings.filterwarnings("ignore") # TODO: remove this in final release
 from utils.utils import fix_lists, fix_band_list, get_data_files_pre_train, remove_shared_months, string_to_boolean, visualize_results, create_loss_plots
-from utils.dataloader import Seviri_Dataset
+from utils.seviri_dataloader import Seviri_Dataset
 from models.MaskedAutoEncoderViT.MaskedAutoEncoderViTModel import MaskedAutoEncoderViTModel
 from torch.utils.data import DataLoader
 from torch.optim.lr_scheduler import OneCycleLR, ReduceLROnPlateau
-from torch.cuda.amp import autocast, GradScaler
 from tqdm import tqdm
 
 def pre_train(
@@ -64,13 +63,13 @@ def pre_train(
         pre_train_data = DataLoader(pre_train_dataset, 
                                     batch_size=batch_size,
                                     shuffle=True,
-                                    num_workers=0)
+                                    num_workers=2)
 
         # define validation data and load into ram
         validation_data = DataLoader(validation_dataset, 
                                     batch_size=batch_size,
                                     shuffle=True,
-                                    num_workers=0)                            
+                                    num_workers=2)                            
         
 
         # Seviri input data have shape of (batch, channels, height, width) = (64, 11, 32, 32)
@@ -99,15 +98,15 @@ def pre_train(
         model.to(device)
 
         # using AdamW optimizer for ViT models
-        optimizer = torch.optim.AdamW(params=model.parameters(), lr=learning_rate, betas=(0.9, 0.95), weight_decay=0.1)
+        optimizer = torch.optim.AdamW(params=model.parameters(), lr=learning_rate, betas=(0.9, 0.95), weight_decay=0.01)
         
         # calculate number of steps per epoch
         steps_per_epoch = len(pre_train_dataset)  # Assuming train_loader is your DataLoader
         total_steps = num_of_epochs * steps_per_epoch
 
         # using learing rate scheduler
-        #scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=learning_rate, total_steps=total_steps)
-        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=3)
+        scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer, max_lr=learning_rate, total_steps=total_steps)
+        #scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min', patience=3)
 
         # track loss 
         metrics = {}
@@ -127,8 +126,6 @@ def pre_train(
                 # forward images to model ands get loss, prediction and mask
                 optimizer.zero_grad()
 
-                #scaler = GradScaler()
-
                 loss, prediction, mask = model(image)
 
                 # get loss value from tensor
@@ -142,16 +139,13 @@ def pre_train(
                 torch.nn.utils.clip_grad_norm_(parameters=model.parameters(), max_norm=1)
                 optimizer.step()
 
-                #scaler.update()
-
                 # chaging learing rate per interation insted of per epoch
-                #scheduler.step(loss_value)
+                scheduler.step()
                 
             print(f"Epoch: {epoch}, Mean pre-train Loss: {mean_loss_interation/len(pre_train_dataset)}, Learing Rate: {optimizer.param_groups[0]['lr']}")    
             
 
             # validation step
-
             # put model into validation mode
             model.eval()
 
@@ -161,7 +155,7 @@ def pre_train(
 
                     # pass input data to gpu device (if cuda was available)
                     image = image.to(device)
-
+                    
                     loss, prediction, mask = model(image)
 
                     # get loss value from tensor
@@ -170,20 +164,26 @@ def pre_train(
                     mean_loss_interation_val += loss_value
                 
                 # update learning rate evvery epoch
-                scheduler.step(mean_loss_interation_val/len(validation_dataset))
-                print(f"Mean validation Loss: {mean_loss_interation_val/len(validation_dataset)}\n")
+                scheduler.step(mean_loss_interation_val/len(validation_data))
+                print(f"Mean validation Loss: {mean_loss_interation_val/len(validation_data)}\n")
 
             # save average metrics for epoch
             metrics[epoch] = {}
-            metrics[epoch]['pre_train_loss'] = mean_loss_interation / len(pre_train_dataset)
-            metrics[epoch]['validation_loss'] = mean_loss_interation_val / len(validation_dataset)
-
+            metrics[epoch]['pre_train_loss'] = mean_loss_interation / len(pre_train_data)
+            metrics[epoch]['validation_loss'] = mean_loss_interation_val / len(validation_data)
+            
             # save current model
-            torch.save(model, f"{checkpoint_path}/epoch_{epoch}.pt")
+            torch.save(model, f"{checkpoint_path}/pre_train_epoch_{epoch}.pt")
 
         visualize_results(model, validation_data)
         create_loss_plots(metrics)
+
         
+        
+        
+       
+        
+                
 
 
             
@@ -200,12 +200,12 @@ def pre_train(
 if __name__ == "__main__":
     os.system('clear')
     # load pre-train config
-    with open('configs/pre-train_config.yaml', 'r') as file:
+    with open('configs/seviri_configs/pre-train_config.yaml', 'r') as file:
         pre_train_config = yaml.safe_load(file)
     file.close()
 
    # load dataset config
-    with open('configs/dataset.yaml', 'r') as file:
+    with open('configs/seviri_configs/dataset.yaml', 'r') as file:
         dataset_config = yaml.safe_load(file)
     file.close()
 
@@ -269,12 +269,12 @@ if __name__ == "__main__":
     mlp_ratio = int(mlp_ratio) # TODO: check if this needs to be a float insted of integer
     norm_pixel_loss = string_to_boolean(norm_pixel_loss)
 
-    # create output folder to save checpoints if not exists
+    # create output folder to save checkpoints if not exist
     os.makedirs(checkpoint_path, exist_ok=True)
 
     # TODO: add wandb logging info
     
-    # intiate pre-training
+    # initiate pre-training
     pre_train(
         dataset_path_images, 
         dataset_path_masks,
@@ -300,3 +300,6 @@ if __name__ == "__main__":
         decoder_num_heads,
         mlp_ratio,
         norm_pixel_loss)  
+        
+        
+        

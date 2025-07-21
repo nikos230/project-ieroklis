@@ -1,6 +1,6 @@
 # This is a simple dataloader for the seviri data
 # it makes use of xarray to open the data and load them 
-# it reutrns a tesnor, is can be used for both
+# it returns a tensor, is can be used for both
 # images and masks
 # =======================================================
 
@@ -8,7 +8,9 @@ import os
 import xarray as xr
 import torch
 import numpy as np
+import albumentations as A
 from torch.utils.data import Dataset
+from torchvision.transforms import transforms
 
 
 class Seviri_Dataset(Dataset):
@@ -21,6 +23,12 @@ class Seviri_Dataset(Dataset):
         self.data             = []
         self.load_data()
 
+        # define transformation for data augmetation
+        self.transform = A.Compose([
+            A.HorizontalFlip(p=0.5),
+            A.VerticalFlip(p=0.5),
+            A.RandomRotate90(p=0.5),
+        ], additional_targets={'mask': 'mask'})
 
 
     def fill_nan_values(self, data):
@@ -129,11 +137,25 @@ class Seviri_Dataset(Dataset):
 
     def __getitem__(self, idx):
         if self.mode == "pre-train":
-            image = self.data[idx]
+            image = np.array(self.data[idx]) 
+
+            # apply transforms
+            image = np.transpose(image, (1, 2, 0))
+            augmented = self.transform(image=image)
+            image = np.transpose(augmented["image"], (2, 0, 1))
+
             return torch.tensor(image, dtype=torch.float32)
             
         elif self.mode == "fine-tune":
-            image, mask = self.data[idx][0], self.data[idx][1]
+            image = np.array(self.data[idx][0])         
+            mask  = np.array(self.data[idx][1][0])
+
+            # apply transforms
+            image = np.transpose(image, (1, 2, 0))
+            augmented = self.transform(image=image, mask=mask)
+            image = np.transpose(augmented["image"], (2, 0, 1))
+            mask = augmented["mask"]
+
             # convert input image and mask to torch tensors and return
             return torch.tensor(image, dtype=torch.float32), torch.tensor(mask, dtype=torch.float32)
 

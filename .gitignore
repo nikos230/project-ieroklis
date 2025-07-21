@@ -178,3 +178,4 @@ cython_debug/
 output/
 dataset/
 pre-trained_models
+wandb/

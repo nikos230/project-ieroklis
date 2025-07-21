@@ -3,6 +3,7 @@
 # MAE: https://github.com/facebookresearch/mae
 # --------------------------------------------------------
 import numpy as np
+from timm.layers import pos_embed
 import torch
 
 
@@ -51,3 +52,42 @@ def get_1d_sincos_pos_embed_from_grid(embed_dim, pos):
     emb = np.concatenate([emb_sin, emb_cos], axis=1)
 
     return emb
+
+
+def interpolate_pos_embed(model, checkpoint_model):
+    
+    if 'pos_embed' in checkpoint_model:
+        pos_embed_checkpoint = checkpoint_model['pos_embed']
+        embedding_size = pos_embed_checkpoint.shape[-1]
+
+        try:
+            num_patches = model.patch_embed.num_patches
+        except AttributeError as err:
+            num_patches = model.patch_embed[0].num_patches
+        
+        num_extra_tokens = model.pos_embed.shape[-2] - num_patches  
+
+        orig_size = int((pos_embed_checkpoint.shape[-2] - num_extra_tokens) **0.5)
+
+        new_size = int(num_patches **0.5)
+
+        if orig_size != new_size:
+            print(f'Interpolating tokens from Original Grid Size: {orig_size} to New Grid Size: {new_size}')
+            
+            extra_tokens = pos_embed_checkpoint[:, :num_extra_tokens]
+            
+            pos_tokens = pos_embed_checkpoint[:, num_extra_tokens:]
+            pos_tokens = pos_tokens.reshape(-1, orig_size, orig_size, embedding_size).permute(0, 3, 1, 2)
+            pos_tokens = torch.nn.functional.interpolate(
+                pos_tokens, size=(new_size, new_size), mode='bicubic', align_corners=False)
+            pos_tokens = pos_tokens.permute(0, 2, 3, 1).flatten(1, 2)
+            new_pos_embed = torch.cat((extra_tokens, pos_tokens), dim=1)
+            checkpoint_model['pos_embed'] = new_pos_embed
+
+            return checkpoint_model
+        
+        else:
+            return checkpoint_model
+
+    else:
+        return checkpoint_model    

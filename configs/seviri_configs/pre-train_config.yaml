@@ -5,20 +5,20 @@ pre-train:
   checkpoint_save_path:  "output/pre_train_seviri_checkpoints"  # path to folder for saving checkpoints
 
   # pre-train settings
-  num_of_epochs:      "50"      # max number of epochs (using 2 for testing)
+  num_of_epochs:      "100"      # max number of epochs (using 2 for testing)
   batch_size:         "64"      # default 64
   learning_rate:      "1.5e-4"  # change later # TODO: rename this into max_learning_rate
   mask_ratio:         "0.75"    # default 75 %
 
   # model h-parameters for ViT Encoder
   patch_size:         "4"      # define a patch size for ViT backbone
-  embed_dim:          "1024"   # default value = 1024
-  depth:              "5"      # default value = 24
+  embed_dim:          "512"    # default value = 1024
+  depth:              "4"      # default value = 24
   num_heads:          "16"     # defult value = 16
 
   # model h-parameters for ViT Decoder
-  decoder_embed_dim:  "512"    # default value = 512
-  decoder_depth:      "3"      # default value = 8
+  decoder_embed_dim:  "256"    # default value = 512
+  decoder_depth:      "2"      # default value = 8
   decoder_num_heads:  "16"     # default value = 16
 
   # additional settings
