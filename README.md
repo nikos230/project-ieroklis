@@ -1,5 +1,5 @@
 # Project Ieroklis 
-"Project Ieroklis" has combined two wildfire downstream tasks, Fire Risk and Fire Spread, by creating a small foundation model called MedST-28. From this model, two additional task-specific models were derived by retaining only the encoder part of MedST-28: an LSTM decoder was added for the Fire Risk task, and a Convolutional decoder was added for the Fire Spread task.
+"Project Ieroklis" has combined two wildfire downstream tasks, Fire Risk and Fire Spread, by creating a small foundation model called MedST-28 which stands for Mediterranean Spatio-Temporal 28. From this model, two additional task-specific models were derived by retaining only the encoder part of MedST-28: an LSTM decoder was added for the Fire Risk task, and a Convolutional decoder was added for the Fire Spread task.
 
 ## About
 This repo contains ready-to-use python code and datasets to:
@@ -42,15 +42,32 @@ Download and put datasets (without changing their names) in the dataset folder, 
 - For Fire Risk dataset open `configs/FireRisk_dataset.yaml` and put the new path in line 4 and dataset stats file in line 5
 - For Fire Spread dataset open `configs/WildfireSpread_dataset.yaml` and put the new path in line 4 and dataset stats file in line 5
 
-For both fine-tuning datasets the stats are already calculated, which are used for normalization in the dataloader, if needed to be calculated run `calc_norm_values_MedST28.py` and in the first lines comment or uncomment lines 17 to 27 accordingly. 
+For both fine-tuning datasets the stats are already calculated, which are used for normalization in the dataloader, if needed to be calculated again run `calc_norm_values_MedST28.py` and in the first lines comment or uncomment lines 17 to 27 accordingly. 
 
 ## Pre-training
-To pre-train the MedST-28 model
+To pre-train the MedST-28 model you need to download the pre-training dataset which has a size of ~500gb.
+- Configure the checkpoint and visual results paths in `configs/pre-train_config.yaml` and chnage the hyper parameters if needed (like depth, patch size, mlp_ratio, etc..)
+- Configure the MedST-28 dataset settings (time_steps, patch_size, variables to be included, train years, validation years, tests years, etc..) in the `configs/MedST28_dataset.yaml`
+- Finally run `pre-train_MedST28.py`
 
+Download pre-trained checkpoints of the model here:
+| Model Size     | Link <br />(Hugging Face)                                                           |
+|:--------------:|:-----------------------------------------------------------------------------------:|
+| MedST28 3.1M   | [Download](https://huggingface.co/nikos230/MedST-28/resolve/main/MedST28_3.1M.pt)   |
+| MedST28 6.3M   | [Download](https://huggingface.co/nikos230/MedST-28/resolve/main/MedST28_6.3M.pt)   |
+| MedST28 50M    | [Download](https://huggingface.co/nikos230/MedST-28/resolve/main/MedST28_50M.pt)    |
 
+3.1M, 6.3M and 50M refer to millions of parameters
 
-### Fine-tune
-210 2310
+## Fine-tune
+The MedST-28 model can be fine-tuned for Fire Risk and Fire Spread. 
+
+### Fire Risk fine-tune
+To fine-tune the MedST-28 model for fire risk you need a pre-train checkpoint of the MedST-28 model. Choose any of the checkpoints above, best results can be achived with MedST28 6.3M.
+- Configure checkpoint and vi
+- Download the Fire Risk dataset and configure paths as explained in the sections above, then run `fine-tune_MedST28_fire_risk.py` 
+
+### Fire Spread fine-tune
 
 
 ## References
