@@ -1,11 +1,27 @@
 # Project Ieroklis 
 "Project Ieroklis" has combined two wildfire downstream tasks, Fire Risk and Fire Spread, by creating a small foundation model called MedST-28 which stands for Mediterranean Spatio-Temporal 28. From this model, two additional task-specific models were derived by retaining only the encoder part of MedST-28: an LSTM decoder was added for the Fire Risk task, and a Convolutional decoder was added for the Fire Spread task.
 
+## Table of Contents
+- [About the Project](#about)
+  - [Datasets](#Datasets)
+  - [Deep Learning Models](#deep-learning-models)
+  - [Models Evaluation and Metrics](#models-evaluation-and-metrics-latest-results-feb-2025)
+  - [Download Best Models and Dataset](#download-best-models-and-dataset)
+  - [Download Datasets for fine-tuning](#Download-links)
+- [Getting Started](#getting-started)
+    - [Pre-training MedST-28](#pre-training)
+      - [Train UNet2D](#train-unet2d)
+      - [Train UNet3D](#train-unet3d)
+      - [Train UNet2D Baseline](#train-unet2d-baseline)
+  - [Tesing the pre-trained Models](#tesing-the-pre-trained-models)
+ - [Contributing / Contact](#contact)
+
 ## About
 This repo contains ready-to-use python code and datasets to:
 - **Pre-train** Masked Auto Encoders (MAE) with Vision Transformer (ViT) backbone
 - **Fine-tune** pre-trained models with MAE encoder and Convolutional or LSTM decoders
 - **Fire Risk** and **Fire Spread** datasets to be used in the fine-tuning of the MedST-28 model
+
 
 ## Getting Started
 First create a new conda enviroment, with any name, here name was choosen as **medst28_env**
@@ -27,6 +43,10 @@ pip install torch torchvision torchaudio --index-url https://download.pytorch.or
 
 ## Datasets
 This repo contains two datasets for fine-tuning, but not the dataset used for the pre-training of the MedST-28 model, to provide more info please contact via email (nikolas619065@gmail.com).
+
+| Variables       | MedST-28 | Fire Risk | Fire Spread |
+|:---------------:|:---------:|:---------:|:-----------:|
+| Max Temperature |            
 
 ### MedST-28 pre-train dataset
 TODO
