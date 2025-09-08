@@ -1,5 +1,5 @@
 # Project Ieroklis 
-"Project Ieroklis has combined two wildfire downstream tasks—Fire Risk and Fire Spread—by creating a small foundation model called MedST-28. From this model, two additional task-specific models were derived by retaining only the encoder part of MedST-28: an LSTM decoder was added for the Fire Risk task, and a Convolutional decoder was added for the Fire Spread task."
+"Project Ieroklis" has combined two wildfire downstream tasks, Fire Risk and Fire Spread, by creating a small foundation model called MedST-28. From this model, two additional task-specific models were derived by retaining only the encoder part of MedST-28: an LSTM decoder was added for the Fire Risk task, and a Convolutional decoder was added for the Fire Spread task.
 
 ## About
 This repo contains ready-to-use python code to:
