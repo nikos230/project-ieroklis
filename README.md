@@ -1,10 +1,10 @@
 # Project Ieroklis 
-
+"Project Ieroklis has combined two wildfire downstream tasks—Fire Risk and Fire Spread—by creating a small foundation model called MedST-28. From this model, two additional task-specific models were derived by retaining only the encoder part of MedST-28: an LSTM decoder was added for the Fire Risk task, and a Convolutional decoder was added for the Fire Spread task."
 
 ## About
-This repo contains ready-to-use python scripts to:
+This repo contains ready-to-use python code to:
 - **Pre-train** Masked Auto Encoders (MAE) with Vision Transformer (ViT) backbone
-- **Fine-tune** pre-trained models with MAE encoder and Convolutional decoder
+- **Fine-tune** pre-trained models with MAE encoder and Convolutional or LSTM decoders
 
 ## Getting Started
 First create a new conda enviroment, with any name, here name was choosen **mae_env**
