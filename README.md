@@ -5,6 +5,10 @@
 This repo contains ready-to-use python code to:
 - **Pre-train** Masked Auto Encoders (MAE) with Vision Transformer (ViT) backbone
 - **Fine-tune** pre-trained models with MAE encoder and Convolutional or LSTM decoders
+<br />
+Also it contains download links for two netCDF datasets :
+- Fire Risk dataset to be used in the fine-tuning of the MedST-28 model
+- Fire Spread dataset to be used in the fine-tuning of the MedST-28 model
 
 ## Getting Started
 First create a new conda enviroment, with any name, here name was choosen **mae_env**
