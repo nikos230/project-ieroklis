@@ -26,18 +26,26 @@ pip install torch torchvision torchaudio --index-url https://download.pytorch.or
 ```
 
 ## Datasets
-This repo contains two datasets for fine-tuning, but not the dataset used for the pre-training of the MedST-28 model, to provide more info please contact via email below.
+This repo contains two datasets for fine-tuning, but not the dataset used for the pre-training of the MedST-28 model, to provide more info please contact via email (nikolas619065@gmail.com).
 
+### Download links
 | Dataset     | Link <br />(HuggingFace)                                                                                   | Size <br /> Zipped | Size <br /> Unzipped  |
 |:-----------:|:----------------------------------------------------------------------------------------------------------:|:------------------:|:---------------------:|
-| Fire Risk   | [Download](https://huggingface.co/datasets/nikos230/FireRisk/resolve/main/fire_risk_dataset_netcdf.zip)    | 148mb              | 812mb
-| Fire Spread | [Download](https://huggingface.co/datasets/nikos230/WildfireSpread/resolve/main/dataset_64_64_10days.zip)  | 12.1gb             | 31gb
+| Fire Risk   | [Download](https://huggingface.co/datasets/nikos230/FireRisk/resolve/main/fire_risk_dataset_netcdf.zip)    | 148mb              | 812mb                 |
+| Fire Spread | [Download](https://huggingface.co/datasets/nikos230/WildfireSpread/resolve/main/dataset_64_64_10days.zip)  | 12.1gb             | 31gb                  |
 
-Fire Risk dataset was picked from Mesogeos datacube [Link to paper](https://arxiv.org/pdf/2306.05144), [Link to Gihub repo](https://github.com/orion-ai-lab/mesogeos) <br />
-Fire Spread dataset was picked from WildfireSpread forecasting with Deep Learning [Link to paper](https://arxiv.org/pdf/2505.17556), [Link to Github repo](https://github.com/nikos230/WildFireSpread)
+Fire Risk dataset was picked from Mesogeos datacube [Link to paper](https://arxiv.org/pdf/2306.05144), [Link to Github repo](https://github.com/orion-ai-lab/mesogeos) and Fire Spread dataset was picked from WildfireSpread forecasting with Deep Learning [Link to paper](https://arxiv.org/pdf/2505.17556), [Link to Github repo](https://github.com/nikos230/WildFireSpread) <br />
+
+### Configure dataset paths
+Download and put datasets (without changing their names) in the dataset folder, then all scripts for pre-training and fine-tune will run. If you put the dataset in another location you will have to configure their paths into the configs. <br />
+- For the pre-training dataset open `configs/MedST28_dataset.yaml` and put the new path in line 4 and dataset stats file in line 5
+- For Fire Risk dataset open `configs/FireRisk_dataset.yaml` and put the new path in line 4 and dataset stats file in line 5
+- For Fire Spread dataset open `configs/WildfireSpread_dataset.yaml` and put the new path in line 4 and dataset stats file in line 5
+
+For both fine-tuning datasets the stats are already calculated, which are used for normalization in the dataloader, if needed to be calculated run `calc_norm_values_MedST28.py` and in the first lines comment or uncomment lines 17 to 27 accordingly. 
 
 ## Pre-training
-With this repo you can use any set of images to pre-train the Masked Auto Encoder ViT model. 
+To pre-train the MedST-28 model
 
 
 
