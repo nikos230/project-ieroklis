@@ -35,6 +35,7 @@ class MedST28_Dataset(Dataset):
         ], additional_targets={'mask': 'mask', 'label': 'label'})
 
 
+
     def fill_nan_values(self, data):
         return data.fillna(self.fill_nan_value)
 
@@ -185,7 +186,7 @@ class MedST28_Dataset(Dataset):
         elif self.mode == "fine-tune-fire_risk":
             sample_path = self.filenames[idx]
             sample_data = xr.open_dataset(sample_path)
-            #sample_data = sample_data.isel(time=slice(20, None))
+            sample_data = sample_data.isel(time=slice(20, None))
             sample_data = self.fill_nan_values(sample_data)
        
             max_time = sample_data.dims['time']
@@ -230,16 +231,42 @@ class MedST28_Dataset(Dataset):
                 #     time_vars.extend(static_stack)
                 #time_tensor = np.stack(time_vars, axis=0)
                 #data_array.append(time_tensor)
+
+            # data_array = []
+
+            # # Static variables
+            # static_vars = []
+            # for var_name in static_var_names:
+            #     var = sample_data[var_name]
+            #     arr = self.normalize(var.values[0], var_name)
+            #     static_vars.append(torch.tensor(arr, dtype=torch.float32))
+            # static_stack = torch.stack(static_vars, dim=0).flatten()  # shape: [static_feat_dim]
+
+            # time_series_data = []
+
+            # for t in range(0, max_time):
+            #     time_vars = []
+            #     for var_name in dynamic_var_names:
+            #         var = sample_data[var_name]
+            #         if 'time' in var.dims:
+            #             val = self.normalize(var.values[t], var_name)
+            #             time_vars.append(torch.tensor(val, dtype=torch.float32))
+
+            #     dynamic_stack = torch.stack(time_vars, dim=0).flatten()  # [dynamic_feat_dim]
+            #     full_features = torch.cat([dynamic_stack, static_stack], dim=0)  # [full_feat_dim]
+            #     time_series_data.append(full_features)
+
+            # time_series_tensor = torch.stack(time_series_data, dim=0) 
     
-       
 
             # label variable
             if sample_data['burned_area_has'].values.max() > 0:
                 class_weights = torch.tensor(np.log1p(sample_data['burned_area_has'].values.max()), dtype=torch.float32)
                 label = 1
+
             else:
                 class_weights = torch.tensor(1, dtype=torch.float32)
-                label = 0    
+                label = 0   
             label = torch.tensor(label, dtype=torch.long)
 
             sample_data.close()
@@ -257,5 +284,5 @@ class MedST28_Dataset(Dataset):
             #     data_transformed.append(torch.stack(step_vars))
             
 
-
+            # return time_series_tensor, label, class_weights
             return torch.stack(data_array), label, class_weights

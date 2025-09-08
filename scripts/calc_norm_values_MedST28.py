@@ -14,17 +14,17 @@ from tqdm import tqdm
 if __name__ == "__main__":
     os.system('clear')
     
-    # with open('configs/MedST-28_configs/MedST28_dataset.yaml', 'r') as file:
-    #     config = yaml.safe_load(file)
-    # file.close() 
+    with open('configs/MedST-28_configs/MedST28_dataset.yaml', 'r') as file:
+        config = yaml.safe_load(file)
+    file.close() 
     
     # with open('configs/MedST-28_configs/WildfireSpread_dataset.yaml', 'r') as file:
     #     config = yaml.safe_load(file)
     # file.close() 
 
-    with open('configs/MedST-28_configs/FireRisk_dataset.yaml', 'r') as file:
-        config = yaml.safe_load(file)
-    file.close() 
+    # with open('configs/MedST-28_configs/FireRisk_dataset.yaml', 'r') as file:
+    #     config = yaml.safe_load(file)
+    # file.close() 
 
 
     # path to dataset folder

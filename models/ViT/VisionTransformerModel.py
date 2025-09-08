@@ -189,3 +189,39 @@ class VisionTransformerLSTM(timm.models.vision_transformer.VisionTransformer):
         logits = self.forward_decoder(features)
 
         return logits    
+    
+
+
+
+import torch
+import torch.nn as nn
+
+class LSTMClassifier(nn.Module):
+    def __init__(self, input_size, hidden_size, num_layers=1, dropout=0.3, bidirectional=False):
+        super(LSTMClassifier, self).__init__()
+        self.hidden_size = hidden_size
+        self.num_layers = num_layers
+        self.bidirectional = bidirectional
+        
+        self.lstm = nn.LSTM(
+            input_size=input_size, 
+            hidden_size=hidden_size,
+            num_layers=num_layers,
+            dropout=dropout if num_layers > 1 else 0,
+            batch_first=True,          # Input: [batch, seq, features]
+            bidirectional=bidirectional
+        )
+        
+        direction_multiplier = 2 if bidirectional else 1
+        self.fc = nn.Linear(hidden_size * direction_multiplier, 2)  # binary classification
+        self.sigmoid = nn.Sigmoid()
+
+    def forward(self, x):
+        # x: [batch_size, seq_len, input_size]
+        lstm_out, _ = self.lstm(x)  # lstm_out: [batch_size, seq_len, hidden_size]
+        
+        # Use the last time step output
+        out = lstm_out[:, -1, :]  # shape: [batch_size, hidden_size * num_directions]
+        out = self.fc(out)        # [batch_size, 1]
+        #out = self.sigmoid(out)   # [batch_size, 1]
+        return out.squeeze()      # [batch_size]

@@ -2,8 +2,8 @@
 
 fine-tune:
   # save path for checkpoints or models
-  checkpoint_save_path:   "output/fine_tune_MedST28_fire_spread_checkpoints_10M"       # path to folder for saving checkpoints while fine-tuning
-  pre_trained_model_path: "pre-trained_models/MedST28_10M.pt"                   # path to a checkpoint model temporal
+  checkpoint_save_path:   "output/fine_tune_MedST28_fire_spread_checkpoints_50M"       # path to folder for saving checkpoints while fine-tuning
+  pre_trained_model_path: "pre-trained_models/MedST28_pre_trained_50M.pt"                   # path to a checkpoint model temporal
   #pre_trained_model_path: "pre-trained_models/MedST28_pre_trained_epoch24.pt"                   # path to a checkpoint model not temporal
 
 
@@ -12,7 +12,7 @@ fine-tune:
   pre_trained_model_name: "none" # google/vit-base-patch16-224 | ibm-nasa-geospatial/Prithvi-EO-1.0-100M
 
   # fine-tune settings
-  num_of_epochs:      "500"       # max number of epochs (using 2 for testing)
+  num_of_epochs:      "100"       # max number of epochs (using 2 for testing)
   batch_size:         "32"      # default 64
   learning_rate:      "1e-4"  # change later 
 

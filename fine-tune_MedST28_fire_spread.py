@@ -361,7 +361,7 @@ if __name__ == "__main__":
     file.close()
 
    # load dataset config
-    with open('configs/MedST-28_configs/WildfireSpread_dataset_temporal.yaml', 'r') as file:
+    with open('configs/MedST-28_configs/WildfireSpread_dataset.yaml', 'r') as file:
         dataset_config = yaml.safe_load(file)
     file.close()
     

@@ -2,8 +2,8 @@
 
 fine-tune:
   # save path for checkpoints or models
-  checkpoint_save_path:   "output/fine_tune_MedST28_fire_risk_1.6M"       # path to folder for saving checkpoints while fine-tuning
-  pre_trained_model_path: "pre-trained_models/MedST28_1.6M.pt"          # path to a checkpoint model
+  checkpoint_save_path:   "output/fine_tune_MedST28_fire_risk_50M"       # path to folder for saving checkpoints while fine-tuning
+  pre_trained_model_path: "pre-trained_models/MedST28_pre_trained_50M.pt"          # path to a checkpoint model
 
   # pre-trained model from Hugging Face (insert model name) input "none" to use a local checkpoint
   # if you use a pre-trained model from Hugging Face then the local pre-trained model (if any) will not be loaded

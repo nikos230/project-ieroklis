@@ -43,11 +43,11 @@ dataset:
     # include_months:         "all"            # include data from months, if set to "all" all available months are included  | "5, 6, 7, 8, 9"
     
   validation:  
-    include_years:          "2021"         
+    include_years:          "2022"         
     # include_months:         "all"     
 
   test:  
-    include_years:          "2022"         
+    include_years:          "2021"         
     # include_months:         "all"     
     
   reference_date:           "2000-01-01"    # reference day to get temporal encoding (Year, Month, Day)

@@ -11,7 +11,7 @@ from utils.utils import modify_state_dict_input_channels, get_configuration, get
 from utils.loss import select_loss_function
 from utils.MedST28_dataloader import MedST28_Dataset
 from utils.metrics import metrics
-from models.ViT.VisionTransformerModel import VisionTransformerLSTM
+from models.ViT.VisionTransformerModel import VisionTransformerLSTM, LSTMClassifier
 from models.ViT.utils import interpolate_pos_embed
 from torch.utils.data import DataLoader
 from torch.optim.lr_scheduler import OneCycleLR, CosineAnnealingLR, ReduceLROnPlateau
@@ -131,6 +131,8 @@ def fine_tune(
                                     lstm_hidden_dim=128,
                                     lstm_num_layers=1)
 
+        # model = LSTMClassifier(input_size=28, hidden_size=256, num_layers=2)
+
 
         # if needed increase proj layer to accept more or less input channels than pre-trained model (new layers will are initiate with zero weights)
         checkpoint_model_state_dict = modify_state_dict_input_channels(checkpoint_model_state_dict, input_channels_number, checkpoint_model_config['input_channels'])
@@ -184,6 +186,7 @@ def fine_tune(
         # for param in model.decoder.parameters():
         #     param.requires_grad = True
 
+
         # main fine-tune loop
         for epoch in range(num_of_epochs): # image shape = (batch, channels, height, width)
 
@@ -198,7 +201,8 @@ def fine_tune(
                 # pass input data to gpu device (if cuda was available)
                 variables = variables.to(device)
                 label = label.to(device)
-                class_weights = class_weights.to(device)
+                class_weights = class_weights.to(device)  
+            
 
                 # forward images to model and get output (batch, channels, height, width)
                 optimizer.zero_grad()
@@ -229,6 +233,8 @@ def fine_tune(
 
                 # chaging learing rate per interation insted of per epoch
                 #scheduler.step()
+
+
 
             # save training loss per epoch
             fine_tune_metrics.save_loss(epoch=epoch, loss_value=mean_loss_epoch/len(fine_tune_data))
@@ -261,7 +267,7 @@ def fine_tune(
 
             # reset metrics for the next epoch
             fine_tune_metrics.reset()
-            
+
             
             # validation step
             # put model into validation mode
@@ -336,7 +342,7 @@ def fine_tune(
 
             # save current model
             torch.save(model, f"{checkpoint_path}/fine_tune_epoch_{epoch}.pt") #
-        
+
         create_fine_tune_plots(fine_tune_metrics, validation_metrics)    
         
         # finish wand logging
