@@ -28,6 +28,15 @@ pip install torch torchvision torchaudio --index-url https://download.pytorch.or
 ## Datasets
 This repo contains two datasets for fine-tuning, but not the dataset used for the pre-training of the MedST-28 model, to provide more info please contact via email (nikolas619065@gmail.com).
 
+### MedST-28 pre-train dataset
+TODO
+
+### Fire Risk fine-tune dataset
+TODO
+
+### Fire Spread fine-tune dataset
+TODO
+
 ### Download links
 | Dataset     | Link <br />(HuggingFace)                                                                                   | Size <br /> Zipped | Size <br /> Unzipped  |
 |:-----------:|:----------------------------------------------------------------------------------------------------------:|:------------------:|:---------------------:|
@@ -51,24 +60,29 @@ To pre-train the MedST-28 model you need to download the pre-training dataset wh
 - Finally run `pre-train_MedST28.py`
 
 Download pre-trained checkpoints of the model here:
-| Model Size     | Link <br />(Hugging Face)                                                           |
+| Model Size*    | Link <br />(Hugging Face)                                                           |
 |:--------------:|:-----------------------------------------------------------------------------------:|
 | MedST28 3.1M   | [Download](https://huggingface.co/nikos230/MedST-28/resolve/main/MedST28_3.1M.pt)   |
 | MedST28 6.3M   | [Download](https://huggingface.co/nikos230/MedST-28/resolve/main/MedST28_6.3M.pt)   |
 | MedST28 50M    | [Download](https://huggingface.co/nikos230/MedST-28/resolve/main/MedST28_50M.pt)    |
 
-3.1M, 6.3M and 50M refer to millions of parameters
+*3.1M, 6.3M and 50M refer to millions of parameters
 
 ## Fine-tune
-The MedST-28 model can be fine-tuned for Fire Risk and Fire Spread. 
+The MedST-28 model can be fine-tuned for Fire Risk and Fire Spread. To add a fine-tuning task please contact via email (nikolas619065@gmail.com)
 
 ### Fire Risk fine-tune
-To fine-tune the MedST-28 model for fire risk you need a pre-train checkpoint of the MedST-28 model. Choose any of the checkpoints above, best results can be achived with MedST28 6.3M.
-- Configure checkpoint and vi
-- Download the Fire Risk dataset and configure paths as explained in the sections above, then run `fine-tune_MedST28_fire_risk.py` 
+To fine-tune the MedST-28 model for fire risk you need a pre-train checkpoint of the MedST-28 model. Choose any of the checkpoints above, best results can be achived with MedST28 3.1M.
+- Configure checkpoints and pre-trained model paths in `configs/fine-tune_config_fire_risk.yaml` in lines 5 and 6, you can also change epochs, loss function, patch_size and batch_size
+- [Download](https://huggingface.co/datasets/nikos230/FireRisk/resolve/main/fire_risk_dataset_netcdf.zip) the Fire Risk dataset and configure paths as explained in ["Configure dataset paths"](Configure-dataset-paths)
+- Finally run `fine-tune_MedST28_fire_risk.py`
+
 
 ### Fire Spread fine-tune
-
+To fine-tune the MedST-28 model for fire spread you need a pre-train checkpoint of the MedST-28 model. Choose any of the checkpoints above, best results can be achived with MedST28 50M.
+- Configure checkpoints and pre-trained model paths in `configs/fine-tune_config_fire_spread.yaml` in lines 5 and 6, you can also change epochs, loss function, patch_size and batch_size
+- [Download](https://huggingface.co/datasets/nikos230/WildfireSpread/resolve/main/dataset_64_64_10days.zip) the Fire Spread dataset and configure paths as explained in ["Configure dataset paths"](Configure-dataset-paths)
+- Finally run `fine-tune_MedST28_fire_spread.py`
 
 ## References
 [https://github.com/sustainlab-group/SatMAE](https://github.com/sustainlab-group/SatMAE) <br/>
