@@ -42,6 +42,18 @@ Install PyTorch separately, to avoid any errors
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu128
 ```
 
+## Deep Learning Models
+Using an Masked Auto Encoder with a Vision Transformer backbone the MedST-28 was pre-trained on a large-scale spatio-temporal dataset, consisting of 28 variables across all Mediterranean region thou years 2006 to 2019. 
+
+### MedST-28
+The achitexcture used for the pre-training is shown below 
+
+### MedST-28 fine-tune for Fire Risk
+
+
+### MedST-28 fine-tune for Fire Spread
+
+
 ## Datasets
 This repo contains two datasets for fine-tuning, but not the dataset used for the pre-training of the MedST-28 model, to provide more info please contact via email (nikolas619065@gmail.com).
 
