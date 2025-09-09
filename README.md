@@ -48,26 +48,26 @@ From this model, two additional task-specific models were derived by retaining o
 ### MedST-28 model
 The architecture used for the pre-training is shown below, its based on [SatMAE-VIT](https://github.com/sustainlab-group/SatMAE) model. To pre-train a `ViT encoder` and `decoder` are used with 75% masking in the input images. The data used for pre-training spans the years 2006 to 2019, while the years 2020, 2021, and 2022 were reserved for validation and testing in the fine-tuning tasks. To prevent data leakage, pre-training was limited to data up to 2019. <br />
 
-`Input of pre-training`: `28 variables` in 64 x 64 pixel patches with 152 channels. <br /> <br />
-The inputs consiists of 28 variables across a 10 day temporal window, so the input tensor has shape of (channels, height, width) = (152, 64, 64)
+`Input of pre-training`: `28 variables` in 64 x 64 pixel patches with 154 channels. <br /> <br />
+The inputs consiists of 28 variables across a 10 day temporal window, so the input tensor has shape of (channels, height, width) = (154, 64, 64)
 
 
 ### MedST-28 fine-tune for Fire Risk
 To fine-tune the MedST-28 model for the Fire Risk task, the ViT decoder was replaced with an `LSTM decoder`. This modification enables the model to learn temporal features by utilizng the features from the pre-trained encoder, the final layer of the model (after the LSTM layer) is a binary classification layer where `0 are un-burned pixels` while `1 are burned pixels`. <br />
 
-`Input of fine-tune for Fire Risk`: 28 variables in 1 x 1 pixel patches with 152 channels* <br />
+`Input of fine-tune for Fire Risk`: 28 variables in 1 x 1 pixel patches with 154 channels* <br />
 `Output of fine-tune for Fire Risk`: Binary Classification <br /> <br />
 
-*The inputs consiists of 28 variables across a 10 day temporal window, so the input tensor has shape of (channels, height, width) = (152, 1, 1)
+*The inputs consiists of 28 variables across a 10 day temporal window, so the input tensor has shape of (channels, height, width) = (154, 1, 1)
 
 
 ### MedST-28 fine-tune for Fire Spread
 To fine-tune the MedST-28 model for the Fire Spread task, the ViT decoder was replaced with an `Convolutional decoder`. This modification enables the model to learn spatial features from the pre-trained encoder. The final layer of the model generates an binary segmatation map, where `0 are un-burned pixels` and `1 are burn pixels`. <br />
 
-`Input of fine-tune Fire Spread`: 28 variables in 64 x 64 pixel patches with 152 channels* <br />
+`Input of fine-tune Fire Spread`: 28 variables in 64 x 64 pixel patches with 154 channels* <br />
 `Output of fine-tune for Fire Spread`: Binary Classification Map (Output size same as Input size, 64x64 pixels) <br /> <br />
 
-*The inputs consiists of 28 variables across a 10 day temporal window, so the input tensor has shape of (channels, height, width) = (152, 64, 64)
+*The inputs consiists of 28 variables across a 10 day temporal window, so the input tensor has shape of (channels, height, width) = (154, 64, 64)
 
 
 | MedST-28 | MedST-28 fine-tune for Fire Risk | MedST-28 fine-tune for Fire Spread |
@@ -76,16 +76,16 @@ To fine-tune the MedST-28 model for the Fire Spread task, the ViT decoder was re
 | <img src="https://github.com/nikos230/project-ieroklis/blob/main/misc/pre-training-setup.png" width="350"> | <img src="https://github.com/nikos230/project-ieroklis/blob/main/misc/fine_tune_fire_risk_setup.png" width="350"> | <img src="https://github.com/nikos230/project-ieroklis/blob/main/misc/fine_tune_fire_spread_setup.png" width="350"> |
 
 ## Datasets
-This repo contains two datasets for fine-tuning, but not the dataset used for the pre-training of the MedST-28 model, to provide more info please contact via email (nikolas619065@gmail.com). To see which vatriables the datasets consists of and the spatial and temporal resolution please visit section  [Dataset Variables, Spatial and Temporal resolutions](#dataset-variables-spatial-and-temporal-resolutions)
+This repo contains two datasets for fine-tuning, but not the dataset used for the pre-training of the MedST-28 model, to provide more info please contact via email (nikolas619065@gmail.com). To see which vatriables the datasets consists of and the spatial and temporal resolution please visit section [Dataset Variables, Spatial and Temporal resolutions](#dataset-variables-spatial-and-temporal-resolutions)
               
 ### MedST-28 pre-train dataset
-TODO
+For pre-training the MedST-28 model, samples were used in the form of 64 × 64 pixel (equivalent to 64 × 64 km) patches with 154 channels. Each channel corresponds to a variable at a specific time step. The 28 variables are repeated for each of the 10 days, while static variables are included only once in the patch. A total of 147,600 samples were used for pre-training and 21,600 for validation and result visualization. All models were pre-trained for 170 epochs.
 
 ### Fire Risk fine-tune dataset
-TODO
+To fine-tune the MedST-28 model for the Fire Risk task, samples where used in form of 1 x 1 km patches. This dataset was picked from the Mesogeos datacube [Link to paper](https://arxiv.org/pdf/2306.05144), [Link to Github repo](https://github.com/orion-ai-lab/mesogeos). Each sample consists of 28 variables and a label indicating whether the pixel is burned (value = 1) or unburned (value = 0). Each sample originally contains 10 time steps, covering the time of ignition and 10 steps prior. Out of 10 time steps time step = 10 is the ingtion day of the fire, thus each sample consists of values of every variable for 10 days before the fire starts. Variable `burned_areas_has` is used as the label in the fine-tuning and has values 0 or 1
 
 ### Fire Spread fine-tune dataset
-TODO
+To fine-tune the MedST-28 model for the Fire Spread task, samples were used in form of 64 x 64 pixel patchs (=64 x 64 km). This dataset was picked from WildfireSpread forecasting with Deep Learning [Link to paper](https://arxiv.org/pdf/2505.17556), [Link to Github repo](https://github.com/nikos230/WildFireSpread). Each sample consits of 27 variables and label .Out of 10 time steps time step = 4 is the ingtion day of the fire, thus each sample consists of values of every variable for 4 days before the fire starts and 5 days after the fire. Variable `burned_areas` is used as the label in the fine-tuning and represents with a binary map the final burned area
 
 ### Download links
 | Dataset     | Link <br />(HuggingFace)                                                                                   | Size <br /> Zipped | Size <br /> Unzipped  |
@@ -93,7 +93,6 @@ TODO
 | Fire Risk   | [Download](https://huggingface.co/datasets/nikos230/FireRisk/resolve/main/fire_risk_dataset_netcdf.zip)    | 148mb              | 812mb                 |
 | Fire Spread | [Download](https://huggingface.co/datasets/nikos230/WildfireSpread/resolve/main/dataset_64_64_10days.zip)  | 12.1gb             | 31gb                  |
 
-Fire Risk dataset was picked from Mesogeos datacube [Link to paper](https://arxiv.org/pdf/2306.05144), [Link to Github repo](https://github.com/orion-ai-lab/mesogeos) and Fire Spread dataset was picked from WildfireSpread forecasting with Deep Learning [Link to paper](https://arxiv.org/pdf/2505.17556), [Link to Github repo](https://github.com/nikos230/WildFireSpread) <br />
 
 ### Configure dataset paths
 Download and put datasets (without changing their names) in the dataset folder, then all scripts for pre-training and fine-tune will run. If you put the dataset in another location you will have to configure their paths into the configs. <br />
@@ -152,7 +151,7 @@ To fine-tune the MedST-28 model for fire spread you need a pre-train checkpoint 
 | Normalized Difference Vegetation Index (NDVI)       |500 x 500 m                 |    16 day                  | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
 | Leaf Area Index (LAI)                               |500 x 500 m                 |    16 day                  | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
 | Soil moisture                                       |5 x 5 km                    |    5 day                   | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
-| Burned Areas                                        |1 x 1 km                    |    1 day                   | <b>✘</b>                          | <b>✔</b>                         | <b>✘</b> (Used as label)            |
+| Burned Areas                                        |1 x 1 km                    |    1 day                   | <b>✘</b>                          | <b>✘</b>                         | <b>✘</b> (Used as label)            |
 | Ignition Points                                     |1 x 1 km                    |    1 day                   | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
 | Slope                                               |30 x 30 m                   |    -                       | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
 | Aspect                                              |30 x 30 m                   |    -                    | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
