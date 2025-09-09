@@ -3,18 +3,24 @@
 
 ## Table of Contents
 - [About the Project](#about)
-  - [Datasets](#Datasets)
-  - [Deep Learning Models](#deep-learning-models)
-  - [Models Evaluation and Metrics](#models-evaluation-and-metrics-latest-results-feb-2025)
-  - [Download Best Models and Dataset](#download-best-models-and-dataset)
-  - [Download Datasets for fine-tuning](#Download-links)
 - [Getting Started](#getting-started)
-    - [Pre-training MedST-28](#pre-training)
-      - [Train UNet2D](#train-unet2d)
-      - [Train UNet3D](#train-unet3d)
-      - [Train UNet2D Baseline](#train-unet2d-baseline)
-  - [Tesing the pre-trained Models](#tesing-the-pre-trained-models)
- - [Contributing / Contact](#contact)
+- [Deep Learning Models](#deep-learning-models)
+  - [MedST-28 model](#medst-28-model)
+  - [MedST-28 fine-tune for Fire Risk](#medst-28-fine-tune-for-fire-risk)
+  - [MedST-28 fine-tune for Fire Spread](#medst-28-fine-tune-for-fire-spread)
+- [Datasets](#datasets)
+  - [MedST-28 pre-train dataset](#medst-28-pre-train-dataset)
+  - [Fire Risk fine-tune dataset](#fire-risk-fine-tune-dataset)
+  - [Fire Spread fine-tune dataset](#fire-spread-fine-tune-dataset)
+  - [Datasets download](#datasets-download)
+  - [Configure dataset paths](#configure-dataset-paths)
+- [Pre-training](#pre-training)
+  - [Pre-trained models download](#pre-trained-models-download)
+- [Fine-tune](#fine-tune)
+  - [Fire Risk fine-tune](#fire-risk-fine-tune)
+  - [Fire Spread fine-tune](#fire-spread-fine-tune)
+- [Results](#results)
+- [Dataset variables, spatial and temporal resolutions](#dataset-variables-spatial-and-temporal-resolutions)
 
 ## About
 This repo contains ready-to-use python code and datasets to:
@@ -87,7 +93,8 @@ To fine-tune the MedST-28 model for the Fire Risk task, samples where used in fo
 ### Fire Spread fine-tune dataset
 To fine-tune the MedST-28 model for the Fire Spread task, samples were used in form of 64 x 64 pixel patchs (=64 x 64 km). This dataset was picked from WildfireSpread forecasting with Deep Learning [Link to paper](https://arxiv.org/pdf/2505.17556), [Link to Github repo](https://github.com/nikos230/WildFireSpread). Each sample consits of 27 variables and label .Out of 10 time steps time step = 4 is the ingtion day of the fire, thus each sample consists of values of every variable for 4 days before the fire starts and 5 days after the fire. Variable `burned_areas` is used as the label in the fine-tuning and represents with a binary map the final burned area
 
-### Download links
+### Datasets download
+Download datasets from the link below. Both datasets are in netCDF form
 | Dataset     | Link <br />(HuggingFace)                                                                                   | Size <br /> Zipped | Size <br /> Unzipped  |
 |:-----------:|:----------------------------------------------------------------------------------------------------------:|:------------------:|:---------------------:|
 | Fire Risk   | [Download](https://huggingface.co/datasets/nikos230/FireRisk/resolve/main/fire_risk_dataset_netcdf.zip)    | 148mb              | 812mb                 |
@@ -108,6 +115,7 @@ To pre-train the MedST-28 model you need to download the pre-training dataset wh
 - Configure the MedST-28 dataset settings (time_steps, patch_size, variables to be included, train years, validation years, tests years, etc..) in the `MedST-28_configs/configs/MedST28_dataset.yaml`
 - Finally run `pre-train_MedST28.py`
 
+### Pre-trained models download
 Download pre-trained checkpoints of the model here:
 | Model Size*    | Link <br />(Hugging Face)                                                           |
 |:--------------:|:-----------------------------------------------------------------------------------:|
