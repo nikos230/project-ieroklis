@@ -46,14 +46,29 @@ Using an Masked Auto Encoder with a Vision Transformer backbone the MedST-28 was
 From this model, two additional task-specific models were derived by retaining only the encoder part of MedST-28: an LSTM decoder was added for the Fire Risk task, and a Convolutional decoder was added for the Fire Spread task.
 
 ### MedST-28 model
-The architecture used for the pre-training is shown below, its based on [SatMAE-VIT](https://github.com/sustainlab-group/SatMAE) model. To pre-train a `ViT encoder` and `decoder` are used with 75% masking in the input images. The data used for pre-training spans the years 2006 to 2019, while the years 2020, 2021, and 2022 were reserved for validation and testing in the fine-tuning tasks. To prevent data leakage, pre-training was limited to data up to 2019.
+The architecture used for the pre-training is shown below, its based on [SatMAE-VIT](https://github.com/sustainlab-group/SatMAE) model. To pre-train a `ViT encoder` and `decoder` are used with 75% masking in the input images. The data used for pre-training spans the years 2006 to 2019, while the years 2020, 2021, and 2022 were reserved for validation and testing in the fine-tuning tasks. To prevent data leakage, pre-training was limited to data up to 2019. <br />
+
+`Input of pre-training`: `28 variables` in 64 x 64 pixel patches with 152 channels. <br /> <br />
+The inputs consiists of 28 variables across a 10 day temporal window, so the input tensor has shape of (channels, height, width) = (152, 64, 64)
 
 
 ### MedST-28 fine-tune for Fire Risk
-To fine-tune the MedST-28 model for the Fire Risk task, the ViT decoder was replaced with an `LSTM decoder`. This modification enables the model to learn temporal features by utilizng the features from the pre-trained encoder, the final layer of the model (after the LSTM layer) is a binary classification layer where `0 are un-burned pixels` while `1 are burned pixels`.
+To fine-tune the MedST-28 model for the Fire Risk task, the ViT decoder was replaced with an `LSTM decoder`. This modification enables the model to learn temporal features by utilizng the features from the pre-trained encoder, the final layer of the model (after the LSTM layer) is a binary classification layer where `0 are un-burned pixels` while `1 are burned pixels`. <br />
+
+`Input of fine-tune for Fire Risk`: 28 variables in 1 x 1 pixel patches with 152 channels* <br />
+`Output of fine-tune for Fire Risk`: Binary Classification <br /> <br />
+
+*The inputs consiists of 28 variables across a 10 day temporal window, so the input tensor has shape of (channels, height, width) = (152, 1, 1)
+
 
 ### MedST-28 fine-tune for Fire Spread
-To fine-tune the MedST-28 model for the Fire Spread task, the ViT decoder was replaced with an `Convolutional decoder`. This modification enables the model to learn spatial features from the pre-trained encoder. The final layer of the model generates an binary segmatation map, where `0 are un-burned pixels` and `1 are burn pixels`. 
+To fine-tune the MedST-28 model for the Fire Spread task, the ViT decoder was replaced with an `Convolutional decoder`. This modification enables the model to learn spatial features from the pre-trained encoder. The final layer of the model generates an binary segmatation map, where `0 are un-burned pixels` and `1 are burn pixels`. <br />
+
+`Input of fine-tune Fire Spread`: 28 variables in 64 x 64 pixel patches with 152 channels* <br />
+`Output of fine-tune for Fire Spread`: Binary Classification Map (Output size same as Input size, 64x64 pixels) <br /> <br />
+
+*The inputs consiists of 28 variables across a 10 day temporal window, so the input tensor has shape of (channels, height, width) = (152, 64, 64)
+
 
 | MedST-28 | MedST-28 fine-tune for Fire Risk | MedST-28 fine-tune for Fire Spread |
 |----------|----------------------------------|-----------------------------------|
@@ -61,36 +76,7 @@ To fine-tune the MedST-28 model for the Fire Spread task, the ViT decoder was re
 | <img src="https://github.com/nikos230/project-ieroklis/blob/main/misc/pre-training-setup.png" width="350"> | <img src="https://github.com/nikos230/project-ieroklis/blob/main/misc/fine_tune_fire_risk_setup.png" width="350"> | <img src="https://github.com/nikos230/project-ieroklis/blob/main/misc/fine_tune_fire_spread_setup.png" width="350"> |
 
 ## Datasets
-This repo contains two datasets for fine-tuning, but not the dataset used for the pre-training of the MedST-28 model, to provide more info please contact via email (nikolas619065@gmail.com).
-
-| Variables                                           | Spatial <br /> resolsution | Temporal <br /> resolution | MedST-28 <br /> pre-trained model | Fire Risk <br /> fine-tuned model | Fire Spread <br /> fine-tuned model |
-|-----------------------------------------------------|:--------------------------:|:--------------------------:|:---------------------------------:|:---------------------------------:|:-----------------------------------:|
-| Max Temperature                                     |9 x 9 km                    |    1 day                   | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
-| Max Wind Direction                                  |9 x 9 km                    |    1 day                   | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
-| Max Surface Pressure                                |9 x 9 km                    |    1 day                   | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
-| Min Relative Humidity                               |9 x 9 km                    |    1 day                   | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
-| Total Precipitation                                 |9 x 9 km                    |    1 day                   | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
-| Mean Surface Solar Radiation Downwards              |9 x 9 km                    |    1 day                   | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
-| Day Land Surface Temperature                        |1 x 1 km                    |    1 day                   | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
-| Night Land Surface Temperature                      |1 x 1 km                    |    1 day                   | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
-| Normalized Difference Vegetation Index (NDVI)       |500 x 500 m                 |    16 day                  | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
-| Leaf Area Index (LAI)                               |500 x 500 m                 |    16 day                  | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
-| Soil moisture                                       |5 x 5 km                    |    5 day                   | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
-| Burned Areas                                        |1 x 1 km                    |    1 day                   | <b>✘</b>                          | <b>✔</b>                         | <b>✘</b> (Used as label)            |
-| Ignition Points                                     |1 x 1 km                    |    1 day                   | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
-| Slope                                               |30 x 30 m                   |    -                       | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
-| Aspect                                              |30 x 30 m                   |    -                    | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
-| Curvature                                           |30 x 30 m                   |    -                    | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
-| Population                                          |300 x 300 m                    |    -                    | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
-| Fraction of agriculture                            |300 x 300 m                    |    -                     | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
-| Fraction of forest                                 |300 x 300 m                     |    -                     | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
-| Fraction of grassland                               |300 x 300 m                     |    -                    | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
-| Fraction of settlements                             |300 x 300 m                     |    -                    | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
-| Fraction of shrubland                               |300 x 300 m                     |    -                    | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
-| Fraction of sparse vegetation                      |300 x 300 m                     |    -                     | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
-| Fraction of water bodies                            |300 x 300 m                     |    -                    | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
-| Fraction of wetland                                |300 x 300 m                     |    -                     | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
-| Roads distance                                     |300 x 300 m                     |    -                     | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
+This repo contains two datasets for fine-tuning, but not the dataset used for the pre-training of the MedST-28 model, to provide more info please contact via email (nikolas619065@gmail.com). To see which vatriables the datasets consists of and the spatial and temporal resolution please visit section  [Dataset Variables, Spatial and Temporal resolutions](#dataset-variables-spatial-and-temporal-resolutions)
               
 ### MedST-28 pre-train dataset
 TODO
@@ -149,6 +135,38 @@ To fine-tune the MedST-28 model for fire spread you need a pre-train checkpoint 
 - Finally run `fine-tune_MedST28_fire_spread.py`
 
 ## Results
+
+
+## Dataset variables, spatial and temporal resolutions
+
+| Variables                                           | Spatial <br /> resolsution | Temporal <br /> resolution | MedST-28 <br /> pre-trained model | Fire Risk <br /> fine-tuned model | Fire Spread <br /> fine-tuned model |
+|-----------------------------------------------------|:--------------------------:|:--------------------------:|:---------------------------------:|:---------------------------------:|:-----------------------------------:|
+| Max Temperature                                     |9 x 9 km                    |    1 day                   | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
+| Max Wind Direction                                  |9 x 9 km                    |    1 day                   | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
+| Max Surface Pressure                                |9 x 9 km                    |    1 day                   | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
+| Min Relative Humidity                               |9 x 9 km                    |    1 day                   | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
+| Total Precipitation                                 |9 x 9 km                    |    1 day                   | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
+| Mean Surface Solar Radiation Downwards              |9 x 9 km                    |    1 day                   | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
+| Day Land Surface Temperature                        |1 x 1 km                    |    1 day                   | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
+| Night Land Surface Temperature                      |1 x 1 km                    |    1 day                   | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
+| Normalized Difference Vegetation Index (NDVI)       |500 x 500 m                 |    16 day                  | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
+| Leaf Area Index (LAI)                               |500 x 500 m                 |    16 day                  | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
+| Soil moisture                                       |5 x 5 km                    |    5 day                   | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
+| Burned Areas                                        |1 x 1 km                    |    1 day                   | <b>✘</b>                          | <b>✔</b>                         | <b>✘</b> (Used as label)            |
+| Ignition Points                                     |1 x 1 km                    |    1 day                   | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
+| Slope                                               |30 x 30 m                   |    -                       | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
+| Aspect                                              |30 x 30 m                   |    -                    | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
+| Curvature                                           |30 x 30 m                   |    -                    | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
+| Population                                          |300 x 300 m                    |    -                    | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
+| Fraction of agriculture                            |300 x 300 m                    |    -                     | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
+| Fraction of forest                                 |300 x 300 m                     |    -                     | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
+| Fraction of grassland                               |300 x 300 m                     |    -                    | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
+| Fraction of settlements                             |300 x 300 m                     |    -                    | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
+| Fraction of shrubland                               |300 x 300 m                     |    -                    | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
+| Fraction of sparse vegetation                      |300 x 300 m                     |    -                     | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
+| Fraction of water bodies                            |300 x 300 m                     |    -                    | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
+| Fraction of wetland                                |300 x 300 m                     |    -                     | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
+| Roads distance                                     |300 x 300 m                     |    -                     | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
 
 ## References
 [https://github.com/sustainlab-group/SatMAE](https://github.com/sustainlab-group/SatMAE) <br/>
