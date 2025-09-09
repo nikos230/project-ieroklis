@@ -136,13 +136,13 @@ To fine-tune the MedST-28 model for fire spread you need a pre-train checkpoint 
 ## Results
 Results from the test tests. For Fire Risk the test samples were in total 4084 with a ratio of `Positives / Negatives = 0.5` and for Fire Spread there were 1102 samples with a ratio of `Positives / Negatives = 0.007`
 
-| Metric (%) | MedST-28 <br /> Fire Risk 3.1M | MedST-28 <br /> Fire Risk 6.3M | MedST-28 <br /> Fire Risk 50M |
-|------------|:------------------------------:|:------------------------------:|:-----------------------------:|
-| Accuracy   | 74.2                           | 76.6                           | 73.4
-| F1 Score   | 71.0                           | 70.9                           | 68.0
-| IoU        | 55.1                           | 54.9                           | 51.6
-| Precision  | 68.1                           | 66.0                           | 63.4
-| Recall     | 74.2                           | 76.6                           | 73.4
+| Metric (%) | MedST-28 <br /> Fire Risk 3.1M | MedST-28 <br /> Fire Risk 6.3M | MedST-28 <br /> Fire Risk 50M | MedST-28 <br /> Fire Spread 3.1M | MedST-28 <br /> Fire Spread 6.3M | MedST-28 <br /> Fire Spread 50M |
+|------------|:------------------------------:|:------------------------------:|:-----------------------------:|:--------------------------------:|:--------------------------------:|:-------------------------------:|
+| Accuracy   | 74.2                           | **76.6**                       | 73.4                          | 
+| F1 Score   | **71.0**                       | 70.9                           | 68.0
+| IoU        | **55.1**                       | 54.9                           | 51.6
+| Precision  | **68.1**                       | 66.0                           | 63.4
+| Recall     | 74.2                           | **76.6**                       | 73.4
 
 
 
