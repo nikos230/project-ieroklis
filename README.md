@@ -53,7 +53,7 @@ The inputs consiists of 28 variables across a 10 day temporal window, so the inp
 
 
 ### MedST-28 fine-tune for Fire Risk
-To fine-tune the MedST-28 model for the Fire Risk task, the ViT decoder was replaced with an `LSTM decoder`. This modification enables the model to learn temporal features by utilizng the features from the pre-trained encoder, the final layer of the model (after the LSTM layer) is a binary classification layer where `0 are un-burned pixels` while `1 are burned pixels`. <br />
+To fine-tune the MedST-28 model for the Fire Risk task, the ViT decoder was replaced with an `LSTM decoder`. This modification enables the model to learn temporal features by utilizng the features from the pre-trained encoder, the final layer of the model (after the LSTM layer) is a binary classification layer where `0 are un-burned pixels` while `1 are burned pixels`. Where were used 19553 samples for fine-tune <br />
 
 `Input of fine-tune for Fire Risk`: 28 variables in 1 x 1 pixel patches with 154 channels* <br />
 `Output of fine-tune for Fire Risk`: Binary Classification <br /> <br />
@@ -62,7 +62,7 @@ To fine-tune the MedST-28 model for the Fire Risk task, the ViT decoder was repl
 
 
 ### MedST-28 fine-tune for Fire Spread
-To fine-tune the MedST-28 model for the Fire Spread task, the ViT decoder was replaced with an `Convolutional decoder`. This modification enables the model to learn spatial features from the pre-trained encoder. The final layer of the model generates an binary segmatation map, where `0 are un-burned pixels` and `1 are burn pixels`. <br />
+To fine-tune the MedST-28 model for the Fire Spread task, the ViT decoder was replaced with an `Convolutional decoder`. This modification enables the model to learn spatial features from the pre-trained encoder. The final layer of the model generates an binary segmatation map, where `0 are un-burned pixels` and `1 are burn pixels`. Where were used 7623 samples for fine-tune <br />
 
 `Input of fine-tune Fire Spread`: 28 variables in 64 x 64 pixel patches with 154 channels* <br />
 `Output of fine-tune for Fire Spread`: Binary Classification Map (Output size same as Input size, 64x64 pixels) <br /> <br />
@@ -134,6 +134,16 @@ To fine-tune the MedST-28 model for fire spread you need a pre-train checkpoint 
 - Finally run `fine-tune_MedST28_fire_spread.py`
 
 ## Results
+Results from the test tests. For Fire Risk the test samples were in total 4084 with a ratio of `Positives / Negatives = 0.5` and for Fire Spread there were 1102 samples with a ratio of `Positives / Negatives = 0.007`
+
+| Metric (%) | MedST-28 <br /> Fire Risk 3.1M | MedST-28 <br /> Fire Risk 6.3M | MedST-28 <br /> Fire Risk 50M |
+|------------|:------------------------------:|:------------------------------:|:-----------------------------:|
+| Accuracy   | 74.2                           | 76.6                           | 73.4
+| F1 Score   | 71.0                           | 70.9                           | 68.0
+| IoU        | 55.1                           | 54.9                           | 51.6
+| Precision  | 68.1                           | 66.0                           | 63.4
+| Recall     | 74.2                           | 76.6                           | 73.4
+
 
 
 ## Dataset variables, spatial and temporal resolutions
@@ -154,18 +164,21 @@ To fine-tune the MedST-28 model for fire spread you need a pre-train checkpoint 
 | Burned Areas                                        |1 x 1 km                    |    1 day                   | <b>✘</b>                          | <b>✘</b>                         | <b>✘</b> (Used as label)            |
 | Ignition Points                                     |1 x 1 km                    |    1 day                   | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
 | Slope                                               |30 x 30 m                   |    -                       | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
-| Aspect                                              |30 x 30 m                   |    -                    | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
-| Curvature                                           |30 x 30 m                   |    -                    | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
-| Population                                          |300 x 300 m                    |    -                    | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
-| Fraction of agriculture                            |300 x 300 m                    |    -                     | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
-| Fraction of forest                                 |300 x 300 m                     |    -                     | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
-| Fraction of grassland                               |300 x 300 m                     |    -                    | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
-| Fraction of settlements                             |300 x 300 m                     |    -                    | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
-| Fraction of shrubland                               |300 x 300 m                     |    -                    | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
-| Fraction of sparse vegetation                      |300 x 300 m                     |    -                     | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
-| Fraction of water bodies                            |300 x 300 m                     |    -                    | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
-| Fraction of wetland                                |300 x 300 m                     |    -                     | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
-| Roads distance                                     |300 x 300 m                     |    -                     | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
+| Aspect                                              |30 x 30 m                   |    -                       | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
+| Curvature                                           |30 x 30 m                   |    -                       | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
+| Population                                          |300 x 300 m                 |    -                       | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
+| Fraction of agriculture                             |300 x 300 m                 |    -                       | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
+| Fraction of forest                                  |300 x 300 m                 |    -                       | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
+| Fraction of grassland                               |300 x 300 m                 |    -                       | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
+| Fraction of settlements                             |300 x 300 m                 |    -                       | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
+| Fraction of shrubland                               |300 x 300 m                 |    -                       | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
+| Fraction of sparse vegetation                       |300 x 300 m                 |    -                       | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
+| Fraction of water bodies                            |300 x 300 m                 |    -                       | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
+| Fraction of wetland                                 |300 x 300 m                 |    -                       | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
+| Roads distance                                      |300 x 300 m                 |    -                       | <b>✔</b>                          | <b>✔</b>                         | <b>✔</b>                            |
+
+## Contact
+For more info or to add a fine-tune task please contact: nikolas619065@gmail.com
 
 ## References
 [https://github.com/sustainlab-group/SatMAE](https://github.com/sustainlab-group/SatMAE) <br/>
