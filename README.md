@@ -59,7 +59,7 @@ The inputs consiists of 28 variables across a 10 day temporal window, so the inp
 
 
 ### MedST-28 fine-tune for Fire Risk
-To fine-tune the MedST-28 model for the Fire Risk task, the ViT decoder was replaced with an `LSTM decoder`. This modification enables the model to learn temporal features by utilizng the features from the pre-trained encoder, the final layer of the model (after the LSTM layer) is a binary classification layer where `0 are un-burned pixels` while `1 are burned pixels`. Where were used 19553 samples for fine-tune <br />
+To fine-tune the MedST-28 model for the Fire Risk task, the ViT decoder was replaced with an `LSTM decoder`. This modification enables the model to learn temporal features by utilizng the features from the pre-trained encoder, the final layer of the model (after the LSTM layer) is a binary classification layer where `0 are un-burned pixels` while `1 are burned pixels`. 19553 samples were used for fine-tune <br />
 
 `Input of fine-tune for Fire Risk`: 28 variables in 1 x 1 pixel patches with 154 channels* <br />
 `Output of fine-tune for Fire Risk`: Binary Classification <br /> <br />
@@ -68,10 +68,10 @@ To fine-tune the MedST-28 model for the Fire Risk task, the ViT decoder was repl
 
 
 ### MedST-28 fine-tune for Fire Spread
-To fine-tune the MedST-28 model for the Fire Spread task, the ViT decoder was replaced with an `Convolutional decoder`. This modification enables the model to learn spatial features from the pre-trained encoder. The final layer of the model generates an binary segmatation map, where `0 are un-burned pixels` and `1 are burn pixels`. Where were used 7623 samples for fine-tune <br />
+To fine-tune the MedST-28 model for the Fire Spread task, the ViT decoder was replaced with an `Convolutional decoder`. This modification enables the model to learn spatial features from the pre-trained encoder. The final layer of the model generates an binary segmatation map, where `0 are un-burned pixels` and `1 are burn pixels`. 7623 samples were used for fine-tune <br />
 
 `Input of fine-tune Fire Spread`: 28 variables in 64 x 64 pixel patches with 154 channels* <br />
-`Output of fine-tune for Fire Spread`: Binary Classification Map (Output size same as Input size, 64x64 pixels) <br /> <br />
+`Output of fine-tune for Fire Spread`: Binary Classification Map (Output size same as Input size, 64 x 64 pixels) <br /> <br />
 
 *The inputs consiists of 28 variables across a 10 day temporal window, so the input tensor has shape of (channels, height, width) = (154, 64, 64)
 
